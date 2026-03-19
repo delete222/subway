@@ -16,54 +16,14 @@
     <link rel="apple-touch-icon" sizes="192x192" href="/apple-touch-icon.jpg" />
     <link rel="apple-touch-icon" sizes="512x512" href="/apple-touch-icon.jpg" />
     
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="/manifest.json" />
+
     
     <!-- 主题颜色 -->
     <meta name="theme-color" content="#3b82f6" />
     
     <title>地铁班次查询</title>
     
-    <script>
-      // Register Service Worker early
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
-            .then(reg => {
-              console.log('Service Worker registered', reg);
-              // Check for updates periodically
-              reg.onupdatefound = () => {
-                const installingWorker = reg.installing;
-                installingWorker.onstatechange = () => {
-                  if (installingWorker.state === 'installed') {
-                    if (navigator.serviceWorker.controller) {
-                      console.log('New content is available; please refresh.');
-                    } else {
-                      console.log('Content is cached for offline use.');
-                    }
-                  }
-                };
-              };
-            })
-            .catch(err => console.error('Service Worker registration failed', err));
-        });
-      }
-      
-      // Handle install prompt
-      let deferredPrompt;
-      window.addEventListener('beforeinstallprompt', (e) => {
-        // Prevent Chrome 67 and earlier from automatically showing the prompt
-        e.preventDefault();
-        // Stash the event so it can be triggered later.
-        deferredPrompt = e;
-        console.log('beforeinstallprompt event was stashed');
-      });
-      
-      window.addEventListener('appinstalled', (evt) => {
-        console.log('PWA was installed');
-        deferredPrompt = null;
-      });
-    </script>
+
   </head>
   <body class="dark:bg-gray-900">
     <div id="root"></div>
