@@ -384,7 +384,7 @@ export default function SubwaySchedule() {
           <motion.div 
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center pt-4 pb-2"
+            className="text-center pt-12 pb-2"
           >
             {/* 顶栏时间卡片 (玻璃拟态) */}
             <div className="mx-auto w-4/5 p-4 rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl">
@@ -468,41 +468,31 @@ export default function SubwaySchedule() {
                 <div className="rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 p-5 shadow-2xl">
                   <div className="flex items-center gap-2 mb-4 text-white">
                     <Train className="w-5 h-5 text-indigo-400" />
-                    <h3 className="font-semibold text-lg tracking-wide">最近班次</h3>
+                    <h3 className="font-semibold text-lg tracking-wide">当日剩余时刻</h3>
                   </div>
                   
                   {availableTrains.length > 0 ? (
-                    <div className="space-y-2.5">
-                      {availableTrains.slice(0, 8).map((train, index) => {
+                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                      {availableTrains.map((train, index) => {
                         const isSelected = isManualMode && selectedTrain?.time === train.time && selectedTrain?.station === train.station;
+                        const isDongguan = train.station.includes('东关');
                         return (
                           <motion.div
-                            whileTap={{ scale: 0.98 }}
+                            whileTap={{ scale: 0.95 }}
                             key={index}
                             onClick={() => handleTrainClick(train)}
-                            className={`flex items-center justify-between p-3.5 rounded-2xl border ${
+                            className={`relative flex flex-col items-center justify-center p-3 rounded-2xl border ${
                               isSelected 
-                                ? 'border-blue-500/50 bg-blue-500/10' 
-                                : 'border-white/5 bg-black/20 hover:bg-black/40'
-                            } transition-all cursor-pointer group`}
+                                ? 'border-blue-500/50 bg-blue-500/20 text-blue-300' 
+                                : 'border-white/5 bg-black/20 text-slate-300 hover:bg-black/40'
+                            } transition-all cursor-pointer`}
                           >
-                            <div className="flex items-center gap-3">
-                              <div className={`w-2 h-2 rounded-full ${train.station.includes('东关') ? 'bg-orange-400 shadow-[0_0_8px_rgba(251,146,60,0.8)]' : 'bg-blue-400 shadow-[0_0_8px_rgba(96,165,250,0.8)]'}`} />
-                              <div className="flex flex-col">
-                                <span className={`font-semibold text-sm text-slate-200`}>
-                                  {train.station}
-                                </span>
-                                {train.status && (
-                                  <span className="text-[10px] text-slate-400 mt-0.5">
-                                    {train.status}
-                                  </span>
-                                )}
-                              </div>
+                            <div className={`absolute top-2 left-2 w-1.5 h-1.5 rounded-full ${isDongguan ? 'bg-orange-400 shadow-[0_0_6px_rgba(251,146,60,0.8)]' : 'bg-blue-400 shadow-[0_0_6px_rgba(96,165,250,0.8)]'}`} />
+                            <div className="font-bold text-lg tabular-nums">
+                              {train.time}
                             </div>
-                            <div className="flex items-center gap-3">
-                              <div className="text-xl font-bold text-slate-100 tabular-nums">
-                                {train.time}
-                              </div>
+                            <div className={`text-[10px] mt-0.5 font-medium ${isDongguan ? 'text-orange-300/80' : 'text-blue-300/80'}`}>
+                              {isDongguan ? '东关' : '西山口'}
                             </div>
                           </motion.div>
                         );
