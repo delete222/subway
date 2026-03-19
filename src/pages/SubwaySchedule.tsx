@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Clock, MapPin, Timer, Train, Zap, Bus } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Clock, Timer, Train, Bus } from 'lucide-react';
 
 interface Schedule {
   hour: number;
@@ -168,6 +166,7 @@ export default function SubwaySchedule() {
   const [availableBuses, setAvailableBuses] = useState<BusSchedule[]>([]);
   const [selectedBus, setSelectedBus] = useState<BusSchedule | null>(null);
   const [isBusManualMode, setIsBusManualMode] = useState(false);
+  const [activeTab, setActiveTab] = useState<'subway' | 'bus'>('subway');
 
   // 计算班次状态
   const getTrainStatus = (minutesLeft: number, isDongguan: boolean): string => {
@@ -371,337 +370,325 @@ export default function SubwaySchedule() {
   }, [currentTime, selectedBusRoute, isBusManualMode, selectedBus]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-3 pb-8 relative overflow-hidden">
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDE2YzAtMi4yMSAxLjc5LTQgNC00czQgMS43OSA0IDQtMS43OSA0LTQgNC00LTEuNzktNC00em0wIDI0YzAtMi4yMSAxLjc5LTQgNC00czQgMS43OSA0IDQtMS43OSA0LTQgNC00LTEuNzktNC00ek0xMiAxNmMwLTIuMjEgMS43OS00IDQtNHM0IDEuNzkgNCA0LTEuNzkgNC00IDQtNC0xLjc5LTQtNHptMCAyNGMwLTIuMjEgMS43OS00IDQtNHM0IDEuNzkgNCA0LTEuNzkgNC00IDQtNC0xLjc5LTQtNHoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-30" />
-      <div className="max-w-2xl mx-auto space-y-3 relative z-10">
-        <div className="text-center pt-3 pb-2">
-          <div className="inline-flex items-center justify-center gap-2 mb-2">
-            <div className="p-2 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg shadow-blue-500/50">
-              <Train className="w-6 h-6 text-white" />
+    <div className="flex flex-col h-[100dvh] bg-slate-950 relative overflow-hidden font-sans">
+      {/* 动态背景 */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-[#0f172a] to-slate-950" />
+      <div className="absolute top-0 inset-x-0 h-64 bg-gradient-to-b from-blue-900/20 to-transparent" />
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDE2YzAtMi4yMSAxLjc5LTQgNC00czQgMS43OSA0IDQtMS43OSA0LTQgNC00LTEuNzktNC00em0wIDI0YzAtMi4yMSAxLjc5LTQgNC00czQgMS43OSA0IDQtMS43OSA0LTQgNC00LTEuNzktNC00ek0xMiAxNmMwLTIuMjEgMS43OS00IDQtNHM0IDEuNzkgNCA0LTEuNzkgNC00IDQtNC0xLjc5LTQtNHptMCAyNGMwLTIuMjEgMS43OS00IDQtNHM0IDEuNzkgNCA0LTEuNzkgNC00IDQtNC0xLjc5LTQtNHoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-20 mix-blend-overlay" />
+
+      {/* 主内容区（可滚动） */}
+      <div className="flex-1 overflow-y-auto overflow-x-hidden pb-24 relative z-10 scrollbar-hide">
+        <div className="max-w-2xl mx-auto p-4 space-y-5">
+          
+          {/* 顶部标题区 */}
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center pt-2 pb-1"
+          >
+            <div className="inline-flex items-center justify-center gap-2 mb-3">
+              <div className="p-2.5 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl shadow-lg shadow-blue-500/30">
+                <Train className="w-6 h-6 text-white" />
+              </div>
             </div>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2 tracking-tight">{"乘车班次查询"}</h1>
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
-            <Zap className="w-3 h-3 text-yellow-400" />
-            <span className="text-xs text-white/90">实时倒计时</span>
-          </div>
-        </div>
-
-        <Card className="shadow-lg bg-white rounded-xl">
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-gray-800 text-base">
-              <Clock className="w-4 h-4 text-blue-600" />
-              当前时间
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-0 pb-3">
-            <div className="text-4xl sm:text-5xl font-bold text-center text-gray-900 tabular-nums">
-              {formatTime(currentTime)}
+            <h1 className="text-2xl font-bold text-white tracking-tight mb-3">班次动态查询</h1>
+            
+            {/* 顶栏时间卡片 (玻璃拟态) */}
+            <div className="mx-auto w-4/5 p-4 rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl">
+              <div className="flex items-center justify-center gap-2 text-indigo-200 text-xs font-semibold uppercase tracking-wider mb-1">
+                <Clock className="w-3.5 h-3.5" />
+                <span>北京时间</span>
+              </div>
+              <div className="text-4xl font-extrabold text-white tracking-widest tabular-nums drop-shadow-md">
+                {formatTime(currentTime)}
+              </div>
             </div>
-          </CardContent>
-        </Card>
+          </motion.div>
 
-        <Tabs defaultValue="subway" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 bg-white/90 backdrop-blur-sm">
-            <TabsTrigger value="subway" className="flex items-center gap-2">
-              <Train className="w-4 h-4" />
-              地铁
-            </TabsTrigger>
-            <TabsTrigger value="bus" className="flex items-center gap-2">
-              <Bus className="w-4 h-4" />
-              班车
-            </TabsTrigger>
-          </TabsList>
-
-          {/* 地铁Tab内容 */}
-          <TabsContent value="subway" className="space-y-3 mt-3">
-            {nextTrain && countdown > 0 && (
-              <Card className="shadow-lg bg-white rounded-xl">
-                <CardContent className="p-4 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-gray-700 text-xs font-medium">
-                      <Timer className="w-3 h-3 text-orange-600" />
-                      {isManualMode ? '已选择班次（倒计时）' : '下一班昌平东关（倒计时）'}
-                    </div>
-                    {isManualMode && (
-                      <button
-                        onClick={handleResetToDefault}
-                        className="text-xs px-3 py-1 bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 transition-colors font-medium"
-                      >
-                        恢复默认
-                      </button>
-                    )}
-                  </div>
-                  
-                  <div className="flex items-center justify-between bg-gray-50 rounded-xl p-3 border border-gray-200">
-                    <div className="flex items-center gap-2">
-                      <div className="p-1.5 bg-orange-100 rounded-lg">
-                        <MapPin className="w-4 h-4 text-orange-600" />
-                      </div>
-                      <span className="text-lg sm:text-xl font-bold text-gray-900">
-                        {nextTrain.station}
-                      </span>
-                    </div>
-                    <div className="text-2xl sm:text-3xl font-bold text-gray-900 tabular-nums">
-                      {nextTrain.time}
-                    </div>
-                  </div>
-                  
-                  <div className="text-center bg-orange-50 rounded-xl p-4 border border-orange-200">
-                    <div className="text-xs text-gray-600 mb-1 font-medium">倒计时</div>
-                    <div className="text-5xl sm:text-6xl font-bold text-orange-600 tabular-nums tracking-tight">
-                      {formatCountdown(countdown)}
-                    </div>
-                    <div className="text-xs text-gray-500 mt-1">分钟:秒</div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {availableTrains.length === 0 && (
-              <Card className="shadow-lg bg-white rounded-xl">
-                <CardContent className="py-12 text-center">
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-orange-100 rounded-full mb-4">
-                    <Clock className="w-8 h-8 text-orange-600" />
-                  </div>
-                  <p className="text-xl font-semibold text-gray-800">由昌平东关始发的列车，已无可赶上的班次</p>
-                </CardContent>
-              </Card>
-            )}
-
-            <Card className="shadow-lg bg-white rounded-xl">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-gray-800">
-                  <Train className="w-5 h-5 text-blue-600" />
-                  最近班次（±10分钟）
-                </CardTitle>
-                <p className="text-xs text-gray-600 mt-1">
-                  昌平东关：重点关注 | 昌平西山口：时间参考
-                </p>
-              </CardHeader>
-              <CardContent className="p-5">
-                {availableTrains.length > 0 ? (
-                  <div className="space-y-3">
-                    {availableTrains.slice(0, 10).map((train, index) => {
-                      const isSelected = isManualMode && selectedTrain?.time === train.time && selectedTrain?.station === train.station;
-                      return (
-                        <div
-                          key={index}
-                          onClick={() => handleTrainClick(train)}
-                          className={`flex items-center justify-between p-4 rounded-xl border-2 ${
-                            isSelected 
-                              ? 'border-blue-500 bg-blue-50 shadow-lg' 
-                              : train.bgColor
-                          } transition-all hover:scale-[1.02] hover:shadow-lg cursor-pointer`}
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className={`flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br ${train.gradientFrom} ${train.gradientTo} text-white font-bold text-sm shadow-md`}>
-                              {index + 1}
-                            </div>
-                            <div className="flex flex-col gap-1">
-                              <div className="flex items-center gap-2">
-                                <MapPin className={`w-4 h-4 ${train.color}`} />
-                                <span className={`font-bold text-base ${train.textColor}`}>
-                                  {train.station}
-                                </span>
-                              </div>
-                              {train.status && (
-                                <span className="text-xs text-gray-600 ml-6">
-                                  {train.status}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <div className="text-2xl font-bold text-gray-800 tabular-nums">
-                              {train.time}
-                            </div>
-                            {isSelected && (
-                              <Badge className="bg-blue-600 text-white">已选</Badge>
-                            )}
-                          </div>
+          <AnimatePresence mode="wait">
+            {activeTab === 'subway' && (
+              <motion.div 
+                key="subway"
+                initial={{ opacity: 0, x: -30 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 30 }}
+                transition={{ duration: 0.3, ease: 'easeOut' }}
+                className="space-y-4"
+              >
+                {/* 地铁倒计时主卡片 */}
+                {nextTrain && countdown > 0 ? (
+                  <div className="relative rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700/50">
+                    <div className="absolute top-0 right-0 p-32 bg-blue-500/10 rounded-full blur-3xl" />
+                    <div className="p-5 relative z-10">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2 text-blue-200 text-xs font-medium bg-blue-500/10 px-3 py-1.5 rounded-full border border-blue-500/20">
+                          <Timer className="w-3.5 h-3.5" />
+                          {isManualMode ? '已选班次' : '系统推荐下一班'}
                         </div>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <p className="text-center text-gray-500 py-6">
-                    暂无可用班次
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* 班车Tab内容 */}
-          <TabsContent value="bus" className="space-y-3 mt-3">
-            {!selectedBusRoute ? (
-              <Card className="shadow-lg bg-white rounded-xl">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-gray-800">
-                    <Bus className="w-5 h-5 text-green-600" />
-                    选择班车线路
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {busRoutes.map((route, index) => (
-                    <div
-                      key={index}
-                      onClick={() => handleBusRouteSelect(route)}
-                      className={`p-5 rounded-xl border-2 ${route.bgColor} transition-all hover:scale-[1.02] hover:shadow-lg cursor-pointer`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className={`flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br ${route.gradientFrom} ${route.gradientTo} text-white font-bold shadow-md`}>
-                            <Bus className="w-5 h-5" />
-                          </div>
-                          <div>
-                            <div className={`font-bold text-lg ${route.textColor}`}>
-                              {route.name}
-                            </div>
-                            <div className="text-sm text-gray-600 mt-1">
-                              {route.from} → {route.to}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {route.schedules.length} 班次
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-            ) : (
-              <>
-                <Card className="shadow-lg bg-white rounded-xl">
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className={`flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br ${selectedBusRoute.gradientFrom} ${selectedBusRoute.gradientTo} text-white font-bold shadow-md`}>
-                          <Bus className="w-5 h-5" />
-                        </div>
-                        <div>
-                          <div className={`font-bold text-lg ${selectedBusRoute.textColor}`}>
-                            {selectedBusRoute.name}
-                          </div>
-                          <div className="text-sm text-gray-600">
-                            {selectedBusRoute.from} → {selectedBusRoute.to}
-                          </div>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => setSelectedBusRoute(null)}
-                        className="text-xs px-3 py-1 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors font-medium"
-                      >
-                        切换线路
-                      </button>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {nextBus && busCountdown > 0 && (
-                  <Card className="shadow-lg bg-white rounded-xl">
-                    <CardContent className="p-4 space-y-3">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2 text-gray-700 text-xs font-medium">
-                          <Timer className="w-3 h-3 text-green-600" />
-                          {isBusManualMode ? '已选择班次（倒计时）' : '下一班班车（倒计时）'}
-                        </div>
-                        {isBusManualMode && (
+                        {isManualMode && (
                           <button
-                            onClick={handleResetBusToDefault}
-                            className="text-xs px-3 py-1 bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 transition-colors font-medium"
+                            onClick={handleResetToDefault}
+                            className="text-xs px-3 py-1.5 bg-white/10 text-white rounded-full hover:bg-white/20 transition-all font-medium backdrop-blur-md"
                           >
                             恢复默认
                           </button>
                         )}
                       </div>
                       
-                      <div className="flex items-center justify-center bg-gray-50 rounded-xl p-3 border border-gray-200">
-                        <div className="text-3xl sm:text-4xl font-bold text-gray-900 tabular-nums">
-                          {nextBus.time}
+                      <div className="flex items-end justify-between mb-6">
+                        <div>
+                          <p className="text-slate-400 text-sm mb-1">开往</p>
+                          <div className="flex items-center gap-2">
+                            <span className="text-2xl font-bold text-white">
+                              {nextTrain.station}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-slate-400 text-sm mb-1">发车时间</p>
+                          <div className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300 tabular-nums">
+                            {nextTrain.time}
+                          </div>
                         </div>
                       </div>
                       
-                      <div className="text-center bg-green-50 rounded-xl p-4 border border-green-200">
-                        <div className="text-xs text-gray-600 mb-1 font-medium">倒计时</div>
-                        <div className="text-5xl sm:text-6xl font-bold text-green-600 tabular-nums tracking-tight">
-                          {formatCountdown(busCountdown)}
+                      {/* 霓虹倒计时 */}
+                      <div className="rounded-2xl bg-black/40 border border-white/5 p-6 flex flex-col items-center justify-center relative overflow-hidden group">
+                        <div className="absolute inset-0 bg-blue-500/5 mix-blend-screen opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <span className="text-sm text-slate-400 mb-2 font-medium tracking-widest">距离发车还有</span>
+                        <div className="text-6xl sm:text-7xl font-black text-white tabular-nums tracking-tighter drop-shadow-[0_0_15px_rgba(59,130,246,0.5)]">
+                          {formatCountdown(countdown)}
                         </div>
-                        <div className="text-xs text-gray-500 mt-1">分钟:秒</div>
                       </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 p-8 text-center shadow-2xl">
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-slate-800 rounded-full mb-4 shadow-inner">
+                      <Clock className="w-8 h-8 text-slate-400" />
+                    </div>
+                    <p className="text-lg font-medium text-slate-300">今日地铁已停运或暂无排班</p>
+                  </div>
                 )}
 
-                {availableBuses.length === 0 && (
-                  <Card className="shadow-lg bg-white rounded-xl">
-                    <CardContent className="py-12 text-center">
-                      <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
-                        <Bus className="w-8 h-8 text-green-600" />
-                      </div>
-                      <p className="text-xl font-semibold text-gray-800">今日班车已结束</p>
-                    </CardContent>
-                  </Card>
-                )}
-
-                <Card className="shadow-lg bg-white rounded-xl">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="flex items-center gap-2 text-gray-800">
-                      <Bus className="w-5 h-5 text-green-600" />
-                      今日剩余班次
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-5">
-                    {availableBuses.length > 0 ? (
-                      <div className="space-y-3">
-                        {availableBuses.slice(0, 10).map((bus, index) => {
-                          const isSelected = isBusManualMode && selectedBus?.time === bus.time;
-                          return (
-                            <div
-                              key={index}
-                              onClick={() => handleBusClick(bus)}
-                              className={`flex items-center justify-between p-4 rounded-xl border-2 ${
-                                isSelected
-                                  ? 'border-blue-500 bg-blue-50 shadow-lg' 
-                                  : selectedBusRoute.bgColor
-                              } transition-all hover:scale-[1.02] hover:shadow-lg cursor-pointer`}
-                            >
-                              <div className="flex items-center gap-3">
-                                <div className={`flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br ${selectedBusRoute.gradientFrom} ${selectedBusRoute.gradientTo} text-white font-bold text-sm shadow-md`}>
-                                  {index + 1}
-                                </div>
-                                <span className={`font-bold text-base ${selectedBusRoute.textColor}`}>
-                                  班次 {index + 1}
+                {/* 地铁班次列表 */}
+                <div className="rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 p-5 shadow-2xl">
+                  <div className="flex items-center gap-2 mb-4 text-white">
+                    <Train className="w-5 h-5 text-indigo-400" />
+                    <h3 className="font-semibold text-lg tracking-wide">最近班次</h3>
+                  </div>
+                  
+                  {availableTrains.length > 0 ? (
+                    <div className="space-y-2.5">
+                      {availableTrains.slice(0, 8).map((train, index) => {
+                        const isSelected = isManualMode && selectedTrain?.time === train.time && selectedTrain?.station === train.station;
+                        return (
+                          <motion.div
+                            whileTap={{ scale: 0.98 }}
+                            key={index}
+                            onClick={() => handleTrainClick(train)}
+                            className={`flex items-center justify-between p-3.5 rounded-2xl border ${
+                              isSelected 
+                                ? 'border-blue-500/50 bg-blue-500/10' 
+                                : 'border-white/5 bg-black/20 hover:bg-black/40'
+                            } transition-all cursor-pointer group`}
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className={`w-2 h-2 rounded-full ${train.station.includes('东关') ? 'bg-orange-400 shadow-[0_0_8px_rgba(251,146,60,0.8)]' : 'bg-blue-400 shadow-[0_0_8px_rgba(96,165,250,0.8)]'}`} />
+                              <div className="flex flex-col">
+                                <span className={`font-semibold text-sm text-slate-200`}>
+                                  {train.station}
                                 </span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <div className="text-2xl font-bold text-gray-800 tabular-nums">
-                                  {bus.time}
-                                </div>
-                                {isSelected && (
-                                  <Badge className="bg-blue-600 text-white">已选</Badge>
+                                {train.status && (
+                                  <span className="text-[10px] text-slate-400 mt-0.5">
+                                    {train.status}
+                                  </span>
                                 )}
                               </div>
                             </div>
-                          );
-                        })}
+                            <div className="flex items-center gap-3">
+                              <div className="text-xl font-bold text-slate-100 tabular-nums">
+                                {train.time}
+                              </div>
+                            </div>
+                          </motion.div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <p className="text-center text-slate-500 py-4 text-sm">暂无可用班次</p>
+                  )}
+                </div>
+              </motion.div>
+            )}
+
+            {activeTab === 'bus' && (
+              <motion.div 
+                key="bus"
+                initial={{ opacity: 0, x: 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -30 }}
+                transition={{ duration: 0.3, ease: 'easeOut' }}
+                className="space-y-4"
+              >
+                {!selectedBusRoute ? (
+                  <div className="space-y-4">
+                    <h2 className="text-white font-semibold text-lg px-2">请选择班车方向</h2>
+                    <div className="grid grid-cols-1 gap-4">
+                      {busRoutes.map((route, index) => (
+                        <motion.div
+                          whileTap={{ scale: 0.98 }}
+                          key={index}
+                          onClick={() => handleBusRouteSelect(route)}
+                          className="relative overflow-hidden p-6 rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 shadow-xl cursor-pointer hover:bg-white/10 transition-all"
+                        >
+                          <div className={`absolute -right-6 -top-6 w-24 h-24 rounded-full bg-gradient-to-br ${route.gradientFrom} ${route.gradientTo} opacity-20 blur-2xl`} />
+                          <div className="flex items-center gap-4 relative z-10">
+                            <div className={`flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br ${route.gradientFrom} ${route.gradientTo} text-white shadow-lg`}>
+                              <Bus className="w-6 h-6" />
+                            </div>
+                            <div>
+                              <div className="font-bold text-xl text-white tracking-wide">
+                                {route.name}
+                              </div>
+                              <div className="text-sm text-slate-400 mt-1 flex items-center gap-2">
+                                <span>{route.from}</span>
+                                <span className="opacity-50">→</span>
+                                <span>{route.to}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex items-center justify-between p-4 rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 shadow-lg mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className={`flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br ${selectedBusRoute.gradientFrom} ${selectedBusRoute.gradientTo} text-white shadow-inner`}>
+                          <Bus className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <div className="font-bold text-white leading-tight">
+                            {selectedBusRoute.name}
+                          </div>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => setSelectedBusRoute(null)}
+                        className="text-xs px-4 py-2 bg-white/10 text-white rounded-full hover:bg-white/20 transition-colors backdrop-blur-md"
+                      >
+                        换向
+                      </button>
+                    </div>
+
+                    {nextBus && busCountdown > 0 ? (
+                      <div className="relative rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700/50">
+                        <div className="absolute top-0 right-0 p-32 bg-green-500/10 rounded-full blur-3xl" />
+                        <div className="p-5 relative z-10">
+                          <div className="flex items-center justify-between mb-6">
+                            <div className="flex items-center gap-2 text-green-200 text-xs font-medium bg-green-500/10 px-3 py-1.5 rounded-full border border-green-500/20">
+                              <Timer className="w-3.5 h-3.5" />
+                              {isBusManualMode ? '已选班次' : '下一趟发车'}
+                            </div>
+                            {isBusManualMode && (
+                              <button
+                                onClick={handleResetBusToDefault}
+                                className="text-xs px-3 py-1.5 bg-white/10 text-white rounded-full hover:bg-white/20 transition-all font-medium backdrop-blur-md"
+                              >
+                                恢复推荐
+                              </button>
+                            )}
+                          </div>
+                          
+                          <div className="text-center mb-6">
+                            <div className="text-5xl sm:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-emerald-300 to-green-500 tabular-nums drop-shadow-sm">
+                              {nextBus.time}
+                            </div>
+                          </div>
+                          
+                          <div className="rounded-2xl bg-black/40 border border-white/5 p-5 flex flex-col items-center justify-center relative">
+                            <span className="text-[10px] text-slate-400 uppercase tracking-[0.2em] mb-1">Countdown</span>
+                            <div className="text-5xl font-bold text-white tabular-nums tracking-tighter drop-shadow-[0_0_12px_rgba(16,185,129,0.4)]">
+                              {formatCountdown(busCountdown)}
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     ) : (
-                      <p className="text-center text-gray-500 py-6">
-                        暂无可用班次
-                      </p>
+                      <div className="rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 p-8 text-center shadow-2xl">
+                        <div className="inline-flex items-center justify-center w-16 h-16 bg-slate-800 rounded-full mb-4">
+                          <Bus className="w-8 h-8 text-slate-400" />
+                        </div>
+                        <p className="text-lg font-medium text-slate-300">今日班车已结束</p>
+                      </div>
                     )}
-                  </CardContent>
-                </Card>
-              </>
+
+                    <div className="rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 p-5 shadow-2xl mt-4">
+                      <h3 className="font-semibold text-slate-200 tracking-wide mb-4">当日剩余时刻</h3>
+                      {availableBuses.length > 0 ? (
+                        <div className="grid grid-cols-2 gap-3">
+                          {availableBuses.map((bus, index) => {
+                            const isSelected = isBusManualMode && selectedBus?.time === bus.time;
+                            return (
+                              <motion.div
+                                whileTap={{ scale: 0.95 }}
+                                key={index}
+                                onClick={() => handleBusClick(bus)}
+                                className={`flex items-center justify-center p-3 rounded-2xl border ${
+                                  isSelected
+                                    ? 'border-green-500/50 bg-green-500/20 text-green-300' 
+                                    : 'border-white/5 bg-black/20 text-slate-300 hover:bg-black/40'
+                                } transition-all cursor-pointer font-bold text-lg tabular-nums`}
+                              >
+                                {bus.time}
+                              </motion.div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <p className="text-center text-slate-500 py-4 text-sm">暂无班车</p>
+                      )}
+                    </div>
+                  </>
+                )}
+              </motion.div>
             )}
-          </TabsContent>
-        </Tabs>
+          </AnimatePresence>
+        </div>
+      </div>
 
-        <div className="text-center text-white/60 text-xs pt-2">
+      {/* 原生应用风格底部导航栏 (毛玻璃) */}
+      <div className="absolute bottom-0 left-0 right-0 z-50">
+        <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-2xl border-t border-white/10" />
+        {/* iPhone 底部安全区内边距 pb-safe 的模拟 (pb-6) */}
+        <div className="relative z-10 flex justify-center items-center py-2 pb-6 max-w-sm mx-auto">
+          <button
+            onClick={() => setActiveTab('subway')}
+            className="flex-1 flex flex-col items-center justify-center py-2 relative group"
+          >
+            <div className={`transition-all duration-300 ${activeTab === 'subway' ? 'text-blue-400 scale-110 drop-shadow-[0_0_8px_rgba(96,165,250,0.6)]' : 'text-slate-500 hover:text-slate-400'}`}>
+              <Train className="w-6 h-6 mb-1" />
+            </div>
+            <span className={`text-[11px] font-medium transition-colors ${activeTab === 'subway' ? 'text-blue-400' : 'text-slate-500'}`}>地铁出行</span>
+            {activeTab === 'subway' && (
+              <motion.div layoutId="nav-indicator" className="absolute top-0 w-12 h-1 bg-blue-500 rounded-full blur-[2px]" />
+            )}
+          </button>
 
+          <button
+            onClick={() => setActiveTab('bus')}
+            className="flex-1 flex flex-col items-center justify-center py-2 relative group"
+          >
+            <div className={`transition-all duration-300 ${activeTab === 'bus' ? 'text-emerald-400 scale-110 drop-shadow-[0_0_8px_rgba(52,211,153,0.6)]' : 'text-slate-500 hover:text-slate-400'}`}>
+              <Bus className="w-6 h-6 mb-1" />
+            </div>
+            <span className={`text-[11px] font-medium transition-colors ${activeTab === 'bus' ? 'text-emerald-400' : 'text-slate-500'}`}>公司班车</span>
+            {activeTab === 'bus' && (
+              <motion.div layoutId="nav-indicator" className="absolute top-0 w-12 h-1 bg-emerald-500 rounded-full blur-[2px]" />
+            )}
+          </button>
         </div>
       </div>
     </div>
