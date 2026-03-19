@@ -1,8 +1,8 @@
-const CACHE_NAME = 'subway-schedule-v2';
+const CACHE_NAME = 'subway-schedule-v3';
 const ASSETS = [
   '/',
   '/index.html',
-  '/manifest.json',
+  '/manifest.webmanifest',
   '/apple-touch-icon.jpg',
   '/favicon.png',
   '/apple-touch-icon.svg'
@@ -12,7 +12,7 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      // Use allSettled to prevent one failure from killing the whole install
+      // Use allSettled to ensure installation continues even if one asset fails
       return Promise.allSettled(
         ASSETS.map((asset) => cache.add(asset))
       );
@@ -33,7 +33,17 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
+      // If we have a cached response, return it. Otherwise fetch from network.
+      if (response) {
+        return response;
+      }
+      
+      // For navigation requests, try to return index.html if possible
+      if (event.request.mode === 'navigate') {
+        return caches.match('/index.html') || fetch(event.request);
+      }
+      
+      return fetch(event.request);
     })
   );
 });
