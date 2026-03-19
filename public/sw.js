@@ -1,21 +1,17 @@
-const CACHE_NAME = 'subway-schedule-v3';
+const CACHE_NAME = 'subway-schedule-v4';
 const ASSETS = [
   '/',
   '/index.html',
-  '/manifest.webmanifest',
-  '/apple-touch-icon.jpg',
-  '/favicon.png',
-  '/apple-touch-icon.svg'
+  '/manifest.json'
 ];
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      // Use allSettled to ensure installation continues even if one asset fails
-      return Promise.allSettled(
-        ASSETS.map((asset) => cache.add(asset))
-      );
+      return cache.addAll(ASSETS).catch(err => {
+        console.error('Cache addAll failed:', err);
+      });
     })
   );
 });
