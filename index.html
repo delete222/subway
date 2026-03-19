@@ -31,10 +31,34 @@
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('/sw.js')
-            .then(reg => console.log('Service Worker registered', reg))
+            .then(reg => {
+              console.log('Service Worker registered', reg);
+              reg.onupdatefound = () => {
+                const installingWorker = reg.installing;
+                installingWorker.onstatechange = () => {
+                  if (installingWorker.state === 'installed') {
+                    if (navigator.serviceWorker.controller) {
+                      console.log('New version found, please refresh');
+                    }
+                  }
+                };
+              };
+            })
             .catch(err => console.error('Service Worker registration failed', err));
         });
       }
+      
+      let deferredPrompt;
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        console.log('beforeinstallprompt triggered');
+      });
+      
+      window.addEventListener('appinstalled', () => {
+        console.log('PWA was installed');
+        deferredPrompt = null;
+      });
     </script>
   </body>
 </html>
