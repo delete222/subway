@@ -384,15 +384,8 @@ export default function SubwaySchedule() {
           <motion.div 
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center pt-2 pb-1"
+            className="text-center pt-4 pb-2"
           >
-            <div className="inline-flex items-center justify-center gap-2 mb-3">
-              <div className="p-2.5 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl shadow-lg shadow-blue-500/30">
-                <Train className="w-6 h-6 text-white" />
-              </div>
-            </div>
-            <h1 className="text-2xl font-bold text-white tracking-tight mb-3">班次动态查询</h1>
-            
             {/* 顶栏时间卡片 (玻璃拟态) */}
             <div className="mx-auto w-4/5 p-4 rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl">
               <div className="flex items-center justify-center gap-2 text-indigo-200 text-xs font-semibold uppercase tracking-wider mb-1">
