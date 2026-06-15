@@ -75,6 +75,7 @@ const changpingStations = [
   '蓟门桥',
 ] as const;
 const homeStationIndex = changpingStations.indexOf('南邵');
+const officeStationIndex = changpingStations.indexOf('西二旗');
 
 const directionOptions: Record<DirectionKey, { label: string; station: string; targetText: string; focusLabel: string }> = {
   morning: {
@@ -208,6 +209,11 @@ function canReachHome(destination: string) {
   return destinationIndex >= 0 && destinationIndex <= homeStationIndex;
 }
 
+function canReachOffice(destination: string) {
+  const destinationIndex = changpingStations.indexOf(normalizeStationName(destination) as (typeof changpingStations)[number]);
+  return destinationIndex >= officeStationIndex;
+}
+
 function findDataset(dayType: DayType, direction: DirectionKey) {
   const option = directionOptions[direction];
   return subwayDatasets.find(
@@ -227,8 +233,8 @@ function buildTrains(dataset: SubwayDataset | undefined, now: Date, direction: D
       const minutesLeft = Math.floor((trainTime.getTime() - now.getTime()) / 1000 / 60);
       if (minutesLeft < -10) return;
 
-      const isFilteredShortTurn = direction === 'evening' && !canReachHome(entry.terminus);
-      const isPreferred = direction === 'morning' ? entry.terminus === '昌平东关站' : !isFilteredShortTurn;
+      const isFilteredShortTurn = direction === 'morning' ? !canReachOffice(entry.terminus) : !canReachHome(entry.terminus);
+      const isPreferred = !isFilteredShortTurn;
 
       trains.push({
         station: dataset.station,
@@ -387,7 +393,7 @@ export default function SubwaySchedule() {
                         <div>
                           <p className="text-slate-400 text-sm mb-1">{nextTrain.focusLabel}</p>
                           <div className="text-2xl font-bold text-white">{nextTrain.station.replace('站', '')}</div>
-                          <p className="mt-1 text-sm text-slate-400">终点 {nextTrain.destination}</p>
+                          <p className="mt-1 text-sm text-slate-400">开往 {nextTrain.destination}</p>
                         </div>
                         <div className="text-right">
                           <p className="text-slate-400 text-sm mb-1">发车时间</p>
@@ -423,7 +429,7 @@ export default function SubwaySchedule() {
                       <Train className="w-5 h-5 text-indigo-400" />
                       <h3 className="font-semibold text-lg tracking-wide">当日剩余时刻</h3>
                     </div>
-                    <span className="text-xs text-slate-400">重点 {preferredCount} 班{direction === 'evening' ? ` · 淡化 ${filteredCount} 班不到家` : ''}</span>
+                    <span className="text-xs text-slate-400">可乘 {preferredCount} 班 · 淡化 {filteredCount} 班{direction === 'morning' ? '不到公司' : '不到家'}</span>
                   </div>
                   {availableTrains.length > 0 ? (
                     <div className="grid grid-cols-2 gap-3">
@@ -445,7 +451,7 @@ export default function SubwaySchedule() {
                           <div className="relative z-10 flex items-start justify-between gap-2">
                             <div className="text-2xl font-black leading-none tabular-nums tracking-normal">{train.time}</div>
                             <span className={`shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold ${train.isPreferred ? 'border-emerald-300/25 bg-emerald-300/15 text-emerald-200' : 'border-white/10 bg-white/5 text-slate-400'}`}>
-                              {train.isPreferred ? (direction === 'morning' ? '重点' : '到家') : train.isFilteredShortTurn ? '不到家' : '普通'}
+                              {train.isPreferred ? (direction === 'morning' ? '到公司' : '到家') : train.isFilteredShortTurn ? (direction === 'morning' ? '不到公司' : '不到家') : '普通'}
                             </span>
                           </div>
                           <div className="relative z-10 mt-3 flex items-end justify-between gap-2">
