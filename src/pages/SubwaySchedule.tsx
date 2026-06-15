@@ -130,7 +130,7 @@ const busRoutes: BusRoute[] = [
     from: '百度大厦',
     to: '方舟大厦',
     gradientFrom: 'from-indigo-500',
-    gradientTo: 'to-cyan-500',
+    gradientTo: 'to-sky-500',
     schedules: [
       { hour: 8, minute: 45, time: '08:45' },
       { hour: 9, minute: 0, time: '09:00' },
@@ -502,19 +502,22 @@ export default function SubwaySchedule() {
             ) : (
               <motion.div key="bus" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} className="space-y-4">
                 {!selectedBusRoute ? (
-                  <div className="space-y-4">
-                    <h2 className="text-white font-semibold text-lg px-2">请选择班车方向</h2>
-                    <div className="grid grid-cols-1 gap-4">
+                  <div className="grid grid-cols-1 gap-4">
                     {busRoutes.map(route => (
-                      <motion.div whileTap={{ scale: 0.98 }} key={route.name} onClick={() => { setSelectedBusRoute(route); setIsBusManualMode(false); setSelectedBus(null); }} className="relative overflow-hidden p-6 rounded-3xl bg-white/5 backdrop-blur-xl border border-cyan-300/10 shadow-xl cursor-pointer hover:bg-cyan-400/10 transition-all">
-                        <div className={`absolute -right-6 -top-6 w-24 h-24 rounded-full bg-gradient-to-br ${route.gradientFrom} ${route.gradientTo} opacity-18 blur-2xl`} />
-                        <div className="flex items-center gap-4 relative z-10">
-                          <div className={`flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br ${route.gradientFrom} ${route.gradientTo} text-white shadow-lg`}><Bus className="h-6 w-6" /></div>
-                          <div><div className="text-xl font-bold text-white tracking-wide">{route.name}</div><div className="mt-1 flex items-center gap-2 text-sm text-slate-400"><span>{route.from}</span><span className="opacity-50">→</span><span>{route.to}</span></div></div>
+                      <motion.div whileTap={{ scale: 0.98 }} key={route.name} onClick={() => { setSelectedBusRoute(route); setIsBusManualMode(false); setSelectedBus(null); }} className="relative overflow-hidden rounded-3xl bg-white/5 backdrop-blur-xl border border-cyan-300/10 shadow-xl cursor-pointer hover:bg-cyan-400/10 transition-all">
+                        <div className={`absolute right-4 top-4 h-24 w-24 rounded-full bg-gradient-to-br ${route.gradientFrom} ${route.gradientTo} opacity-20 blur-2xl`} />
+                        <div className="relative z-10 flex items-center justify-between gap-4 p-5">
+                          <div className="flex min-w-0 items-center gap-4">
+                            <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br ${route.gradientFrom} ${route.gradientTo} text-white shadow-lg`}><Bus className="h-6 w-6" /></div>
+                            <div className="min-w-0">
+                              <div className="truncate text-xl font-bold text-white tracking-wide">{route.name}</div>
+                              <div className="mt-1 flex items-center gap-2 text-sm text-slate-400"><span>{route.from}</span><span className="opacity-50">→</span><span>{route.to}</span></div>
+                            </div>
+                          </div>
+                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-cyan-300/15 bg-cyan-400/10 text-cyan-100">›</div>
                         </div>
                       </motion.div>
                     ))}
-                    </div>
                   </div>
                 ) : (
                   <>
