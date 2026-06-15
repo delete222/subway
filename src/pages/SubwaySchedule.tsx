@@ -275,13 +275,16 @@ function buildTrains(dataset: SubwayDataset | undefined, now: Date, direction: D
   return trains.sort((a, b) => a.hour - b.hour || a.minute - b.minute || a.destination.localeCompare(b.destination, 'zh-CN'));
 }
 
+function getSecondsUntil(now: Date, hour: number, minute: number) {
+  return Math.floor((new Date(now).setHours(hour, minute, 0, 0) - now.getTime()) / 1000);
+}
+
 export default function SubwaySchedule() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [activeTab, setActiveTab] = useState<TabKey>(() => getDefaultTab(new Date()));
   const [direction, setDirection] = useState<DirectionKey>(() => getDefaultDirection(new Date()));
   const [dayType, setDayType] = useState<DayType>(() => getDayType(new Date()));
   const [isAutoDirection, setIsAutoDirection] = useState(true);
-  const [isAutoTab, setIsAutoTab] = useState(true);
   const [selectedTrain, setSelectedTrain] = useState<SubwayTrain | null>(null);
   const [isManualMode, setIsManualMode] = useState(false);
   const [selectedBusRoute, setSelectedBusRoute] = useState<BusRoute | null>(null);
@@ -296,15 +299,30 @@ export default function SubwaySchedule() {
   useEffect(() => {
     setDayType(getDayType(currentTime));
     if (isAutoDirection) setDirection(getDefaultDirection(currentTime));
-    if (isAutoTab) setActiveTab(getDefaultTab(currentTime));
-  }, [currentTime, isAutoDirection, isAutoTab]);
+  }, [currentTime, isAutoDirection]);
+
+  useEffect(() => {
+    if (!isManualMode || !selectedTrain) return;
+    if (getSecondsUntil(currentTime, selectedTrain.hour, selectedTrain.minute) < 0) {
+      setIsManualMode(false);
+      setSelectedTrain(null);
+    }
+  }, [currentTime, isManualMode, selectedTrain]);
+
+  useEffect(() => {
+    if (!isBusManualMode || !selectedBus) return;
+    if (getSecondsUntil(currentTime, selectedBus.hour, selectedBus.minute) < 0) {
+      setIsBusManualMode(false);
+      setSelectedBus(null);
+    }
+  }, [currentTime, isBusManualMode, selectedBus]);
 
   const dataset = useMemo(() => findDataset(dayType, direction), [dayType, direction]);
   const availableTrains = useMemo(() => buildTrains(dataset, currentTime, direction), [dataset, currentTime, direction]);
   const recommendedTrain = availableTrains.find(train => train.isPreferred && train.minutesLeft >= 0) ?? availableTrains.find(train => !train.isFilteredShortTurn && train.minutesLeft >= 0) ?? null;
   const nextTrain = isManualMode && selectedTrain ? selectedTrain : recommendedTrain;
   const countdown = nextTrain
-    ? Math.max(0, Math.floor((new Date(currentTime).setHours(nextTrain.hour, nextTrain.minute, 0, 0) - currentTime.getTime()) / 1000))
+    ? Math.max(0, getSecondsUntil(currentTime, nextTrain.hour, nextTrain.minute))
     : 0;
 
   const availableBuses = useMemo(() => {
@@ -320,7 +338,7 @@ export default function SubwaySchedule() {
   const recommendedBus = availableBuses[0] ?? null;
   const nextBus = isBusManualMode && selectedBus ? selectedBus : recommendedBus;
   const busCountdown = nextBus
-    ? Math.max(0, Math.floor((new Date(currentTime).setHours(nextBus.hour, nextBus.minute, 0, 0) - currentTime.getTime()) / 1000))
+    ? Math.max(0, getSecondsUntil(currentTime, nextBus.hour, nextBus.minute))
     : 0;
 
   const handleDirectionChange = (nextDirection: DirectionKey) => {
@@ -365,7 +383,6 @@ export default function SubwaySchedule() {
                 key={tab}
                 onClick={() => {
                   setActiveTab(tab);
-                  setIsAutoTab(false);
                 }}
                 className={`flex h-11 items-center justify-center gap-2 rounded-2xl border text-sm font-semibold transition ${activeTab === tab ? 'border-cyan-300/30 bg-cyan-400/15 text-cyan-100 shadow-[0_0_18px_rgba(34,211,238,0.12)]' : 'border-transparent text-slate-300 hover:bg-white/10'}`}
               >
@@ -468,7 +485,7 @@ export default function SubwaySchedule() {
                         <motion.button
                           whileTap={{ scale: 0.96 }}
                           key={`${train.time}-${train.destination}`}
-                          onClick={() => { setSelectedTrain(train); setIsManualMode(true); }}
+                          onClick={() => { setSelectedTrain(train); setIsManualMode(true); setIsAutoDirection(false); }}
                           className={`relative min-h-[92px] overflow-hidden rounded-2xl border p-3 text-left transition-all hover:opacity-100 ${isSelected ? 'border-cyan-300/60 bg-cyan-500/18 text-cyan-50 shadow-[0_0_22px_rgba(34,211,238,0.15)]' : tone}`}
                         >
                           <div className={`absolute -right-6 -top-8 h-20 w-20 rounded-full blur-2xl ${train.isPreferred ? 'bg-cyan-400/20' : 'bg-white/5'}`} />
