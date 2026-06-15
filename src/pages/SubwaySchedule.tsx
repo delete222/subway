@@ -129,8 +129,8 @@ const busRoutes: BusRoute[] = [
     name: '百度大厦→方舟',
     from: '百度大厦',
     to: '方舟大厦',
-    gradientFrom: 'from-indigo-500',
-    gradientTo: 'to-sky-500',
+    gradientFrom: 'from-violet-500',
+    gradientTo: 'to-indigo-500',
     schedules: [
       { hour: 8, minute: 45, time: '08:45' },
       { hour: 9, minute: 0, time: '09:00' },
