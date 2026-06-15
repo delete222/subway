@@ -82,7 +82,7 @@ const directionOptions: Record<DirectionKey, { label: string; station: string; t
     label: '上班去公司',
     station: '南邵站',
     targetText: '开往蓟门桥站方向',
-    focusLabel: '南邵出发去西二旗',
+    focusLabel: '昌平东关发车，南邵上车',
   },
   evening: {
     label: '下班回家',
@@ -170,7 +170,7 @@ function getTrainStatus(minutesLeft: number, direction: DirectionKey, isPreferre
   if (direction === 'evening') {
     return isPreferred ? '可到南邵' : '短线车';
   }
-  if (!isPreferred) return '';
+  if (!isPreferred) return '普通班次';
   if (minutesLeft < 0) return '已过站';
   if (minutesLeft < TRAVEL_TIME_MIN) return '来不及了';
   if (minutesLeft <= TRAVEL_TIME_MAX) return '赶紧出发';
@@ -214,6 +214,21 @@ function canReachOffice(destination: string) {
   return destinationIndex >= officeStationIndex;
 }
 
+function isDongguanDeparture(entry: SubwayEntry) {
+  return entry.terminus.startsWith('昌平东关站') && !entry.terminus.includes('通过不停车');
+}
+
+function skipsNanShao(entry: SubwayEntry) {
+  return entry.terminus.includes('南邵站通过不停车');
+}
+
+function getTrainDetail(train: SubwayTrain, direction: DirectionKey) {
+  if (direction === 'morning') {
+    return train.isPreferred ? '昌平东关发车' : `开往 ${train.destination.replace('站', '')}`;
+  }
+  return `开往 ${train.destination.replace('站', '')}`;
+}
+
 function findDataset(dayType: DayType, direction: DirectionKey) {
   const option = directionOptions[direction];
   return subwayDatasets.find(
@@ -233,8 +248,8 @@ function buildTrains(dataset: SubwayDataset | undefined, now: Date, direction: D
       const minutesLeft = Math.floor((trainTime.getTime() - now.getTime()) / 1000 / 60);
       if (minutesLeft < -10) return;
 
-      const isFilteredShortTurn = direction === 'morning' ? !canReachOffice(entry.terminus) : !canReachHome(entry.terminus);
-      const isPreferred = !isFilteredShortTurn;
+      const isFilteredShortTurn = direction === 'morning' ? skipsNanShao(entry) || !canReachOffice(entry.terminus) : !canReachHome(entry.terminus);
+      const isPreferred = direction === 'morning' ? isDongguanDeparture(entry) : !isFilteredShortTurn;
 
       trains.push({
         station: dataset.station,
@@ -279,7 +294,7 @@ export default function SubwaySchedule() {
 
   const dataset = useMemo(() => findDataset(dayType, direction), [dayType, direction]);
   const availableTrains = useMemo(() => buildTrains(dataset, currentTime, direction), [dataset, currentTime, direction]);
-  const recommendedTrain = availableTrains.find(train => train.isPreferred && train.minutesLeft >= 0) ?? availableTrains.find(train => train.minutesLeft >= 0) ?? null;
+  const recommendedTrain = availableTrains.find(train => train.isPreferred && train.minutesLeft >= 0) ?? availableTrains.find(train => !train.isFilteredShortTurn && train.minutesLeft >= 0) ?? null;
   const nextTrain = isManualMode && selectedTrain ? selectedTrain : recommendedTrain;
   const countdown = nextTrain
     ? Math.max(0, Math.floor((new Date(currentTime).setHours(nextTrain.hour, nextTrain.minute, 0, 0) - currentTime.getTime()) / 1000))
@@ -393,7 +408,7 @@ export default function SubwaySchedule() {
                         <div>
                           <p className="text-slate-400 text-sm mb-1">{nextTrain.focusLabel}</p>
                           <div className="text-2xl font-bold text-white">{nextTrain.station.replace('站', '')}</div>
-                          <p className="mt-1 text-sm text-slate-400">开往 {nextTrain.destination}</p>
+                          <p className="mt-1 text-sm text-slate-400">{getTrainDetail(nextTrain, direction)}</p>
                         </div>
                         <div className="text-right">
                           <p className="text-slate-400 text-sm mb-1">发车时间</p>
@@ -429,7 +444,7 @@ export default function SubwaySchedule() {
                       <Train className="w-5 h-5 text-indigo-400" />
                       <h3 className="font-semibold text-lg tracking-wide">当日剩余时刻</h3>
                     </div>
-                    <span className="text-xs text-slate-400">可乘 {preferredCount} 班 · 淡化 {filteredCount} 班{direction === 'morning' ? '不到公司' : '不到家'}</span>
+                    <span className="text-xs text-slate-400">{direction === 'morning' ? `东关发车 ${preferredCount} 班` : `可到家 ${preferredCount} 班`} · 淡化 {filteredCount} 班{direction === 'morning' ? '不可乘' : '不到家'}</span>
                   </div>
                   {availableTrains.length > 0 ? (
                     <div className="grid grid-cols-2 gap-3">
@@ -451,13 +466,13 @@ export default function SubwaySchedule() {
                           <div className="relative z-10 flex items-start justify-between gap-2">
                             <div className="text-2xl font-black leading-none tabular-nums tracking-normal">{train.time}</div>
                             <span className={`shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold ${train.isPreferred ? 'border-emerald-300/25 bg-emerald-300/15 text-emerald-200' : 'border-white/10 bg-white/5 text-slate-400'}`}>
-                              {train.isPreferred ? (direction === 'morning' ? '到公司' : '到家') : train.isFilteredShortTurn ? (direction === 'morning' ? '不到公司' : '不到家') : '普通'}
+                              {train.isPreferred ? (direction === 'morning' ? '东关发车' : '到家') : train.isFilteredShortTurn ? (direction === 'morning' ? '不可乘' : '不到家') : '普通'}
                             </span>
                           </div>
                           <div className="relative z-10 mt-3 flex items-end justify-between gap-2">
                             <div className="min-w-0">
                               <div className={`truncate text-sm font-semibold ${train.isPreferred ? 'text-emerald-100' : 'text-slate-400'}`}>
-                                {train.destination.replace('站', '')}
+                                {direction === 'morning' && train.isPreferred ? '南邵上车' : train.destination.replace('站', '')}
                               </div>
                               <div className={`mt-0.5 truncate text-[10px] ${train.isPreferred ? 'text-emerald-200/70' : 'text-slate-600'}`}>
                                 {train.status || '普通班次'}
