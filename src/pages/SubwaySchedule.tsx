@@ -31,6 +31,7 @@ interface SubwayTrain {
   minute: number;
   minutesLeft: number;
   isPreferred: boolean;
+  isDongguanDeparture: boolean;
   isFilteredShortTurn: boolean;
   status: string;
 }
@@ -224,7 +225,7 @@ function skipsNanShao(entry: SubwayEntry) {
 
 function getTrainDetail(train: SubwayTrain, direction: DirectionKey) {
   if (direction === 'morning') {
-    return train.isPreferred ? '昌平东关发车' : `开往 ${train.destination.replace('站', '')}`;
+    return train.isDongguanDeparture ? '昌平东关发车，南邵上车' : `开往 ${train.destination.replace('站', '')}`;
   }
   return `开往 ${train.destination.replace('站', '')}`;
 }
@@ -248,8 +249,9 @@ function buildTrains(dataset: SubwayDataset | undefined, now: Date, direction: D
       const minutesLeft = Math.floor((trainTime.getTime() - now.getTime()) / 1000 / 60);
       if (minutesLeft < -10) return;
 
+      const isDongguanDepartureTrain = direction === 'morning' && isDongguanDeparture(entry);
       const isFilteredShortTurn = direction === 'morning' ? skipsNanShao(entry) || !canReachOffice(entry.terminus) : !canReachHome(entry.terminus);
-      const isPreferred = direction === 'morning' ? isDongguanDeparture(entry) : !isFilteredShortTurn;
+      const isPreferred = direction === 'morning' ? isDongguanDepartureTrain : !isFilteredShortTurn;
 
       trains.push({
         station: dataset.station,
@@ -261,6 +263,7 @@ function buildTrains(dataset: SubwayDataset | undefined, now: Date, direction: D
         minute: entry.minute,
         minutesLeft,
         isPreferred,
+        isDongguanDeparture: isDongguanDepartureTrain,
         isFilteredShortTurn,
         status: getTrainStatus(minutesLeft, direction, isPreferred),
       });
@@ -472,7 +475,7 @@ export default function SubwaySchedule() {
                           <div className="relative z-10 mt-3 flex items-end justify-between gap-2">
                             <div className="min-w-0">
                               <div className={`truncate text-sm font-semibold ${train.isPreferred ? 'text-emerald-100' : 'text-slate-400'}`}>
-                                {direction === 'morning' && train.isPreferred ? '南邵上车' : train.destination.replace('站', '')}
+                                {direction === 'morning' && train.isDongguanDeparture ? '南邵上车' : train.destination.replace('站', '')}
                               </div>
                               <div className={`mt-0.5 truncate text-[10px] ${train.isPreferred ? 'text-emerald-200/70' : 'text-slate-600'}`}>
                                 {train.status || '普通班次'}
