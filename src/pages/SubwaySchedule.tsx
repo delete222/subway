@@ -129,8 +129,8 @@ const busRoutes: BusRoute[] = [
     name: '百度大厦→方舟',
     from: '百度大厦',
     to: '方舟大厦',
-    gradientFrom: 'from-violet-500',
-    gradientTo: 'to-fuchsia-500',
+    gradientFrom: 'from-indigo-500',
+    gradientTo: 'to-cyan-500',
     schedules: [
       { hour: 8, minute: 45, time: '08:45' },
       { hour: 9, minute: 0, time: '09:00' },
@@ -506,8 +506,8 @@ export default function SubwaySchedule() {
                     <h2 className="text-white font-semibold text-lg px-2">请选择班车方向</h2>
                     <div className="grid grid-cols-1 gap-4">
                     {busRoutes.map(route => (
-                      <motion.div whileTap={{ scale: 0.98 }} key={route.name} onClick={() => { setSelectedBusRoute(route); setIsBusManualMode(false); setSelectedBus(null); }} className="relative overflow-hidden p-6 rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 shadow-xl cursor-pointer hover:bg-white/10 transition-all">
-                        <div className={`absolute -right-6 -top-6 w-24 h-24 rounded-full bg-gradient-to-br ${route.gradientFrom} ${route.gradientTo} opacity-20 blur-2xl`} />
+                      <motion.div whileTap={{ scale: 0.98 }} key={route.name} onClick={() => { setSelectedBusRoute(route); setIsBusManualMode(false); setSelectedBus(null); }} className="relative overflow-hidden p-6 rounded-3xl bg-white/5 backdrop-blur-xl border border-cyan-300/10 shadow-xl cursor-pointer hover:bg-cyan-400/10 transition-all">
+                        <div className={`absolute -right-6 -top-6 w-24 h-24 rounded-full bg-gradient-to-br ${route.gradientFrom} ${route.gradientTo} opacity-18 blur-2xl`} />
                         <div className="flex items-center gap-4 relative z-10">
                           <div className={`flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br ${route.gradientFrom} ${route.gradientTo} text-white shadow-lg`}><Bus className="h-6 w-6" /></div>
                           <div><div className="text-xl font-bold text-white tracking-wide">{route.name}</div><div className="mt-1 flex items-center gap-2 text-sm text-slate-400"><span>{route.from}</span><span className="opacity-50">→</span><span>{route.to}</span></div></div>
@@ -518,12 +518,12 @@ export default function SubwaySchedule() {
                   </div>
                 ) : (
                   <>
-                    <div className="flex items-center justify-between p-4 rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 shadow-lg mb-4">
+                    <div className="flex items-center justify-between p-4 rounded-3xl bg-white/5 backdrop-blur-xl border border-cyan-300/10 shadow-lg mb-4">
                       <div className="flex items-center gap-3">
                         <div className={`flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br ${selectedBusRoute.gradientFrom} ${selectedBusRoute.gradientTo} text-white shadow-inner`}><Bus className="w-5 h-5" /></div>
                         <div className="font-bold text-white leading-tight">{selectedBusRoute.name}</div>
                       </div>
-                      <button onClick={() => setSelectedBusRoute(null)} className="text-xs px-4 py-2 bg-white/10 text-white rounded-full hover:bg-white/20 transition-colors backdrop-blur-md">换向</button>
+                      <button onClick={() => setSelectedBusRoute(null)} className="text-xs px-4 py-2 bg-cyan-400/10 text-cyan-100 rounded-full hover:bg-cyan-400/15 transition-colors backdrop-blur-md border border-cyan-300/10">换向</button>
                     </div>
                     {nextBus ? (
                       <div className="relative rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700/50">
@@ -546,11 +546,23 @@ export default function SubwaySchedule() {
                         </div>
                       </div>
                     ) : <div className="rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 p-8 text-center shadow-2xl text-slate-300">今日班车已结束</div>}
-                    <div className="rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 p-5 shadow-2xl mt-4">
+                    <div className="rounded-3xl bg-white/5 backdrop-blur-xl border border-cyan-300/10 p-5 shadow-2xl mt-4">
                       <h3 className="font-semibold text-slate-200 tracking-wide mb-4">当日剩余时刻</h3>
                       <div className="grid grid-cols-2 gap-3">
                         {availableBuses.map(bus => (
-                          <motion.button whileTap={{ scale: 0.95 }} key={bus.time} onClick={() => { setSelectedBus(bus); setIsBusManualMode(true); }} className="relative p-4 rounded-2xl border border-white/5 bg-black/20 text-slate-300 hover:bg-black/40 transition-all text-lg font-bold tabular-nums">{bus.time}</motion.button>
+                          <motion.button
+                            whileTap={{ scale: 0.95 }}
+                            key={bus.time}
+                            onClick={() => { setSelectedBus(bus); setIsBusManualMode(true); }}
+                            className={`relative overflow-hidden p-4 rounded-2xl border transition-all text-lg font-bold tabular-nums ${
+                              isBusManualMode && selectedBus?.time === bus.time
+                                ? 'border-cyan-300/50 bg-cyan-400/18 text-cyan-50 shadow-[0_0_18px_rgba(34,211,238,0.12)]'
+                                : 'border-white/5 bg-black/20 text-slate-300 hover:bg-cyan-400/10 hover:border-cyan-300/20'
+                            }`}
+                          >
+                            <span className="absolute -right-4 -top-6 h-16 w-16 rounded-full bg-cyan-400/10 blur-2xl" />
+                            <span className="relative z-10">{bus.time}</span>
+                          </motion.button>
                         ))}
                       </div>
                     </div>
