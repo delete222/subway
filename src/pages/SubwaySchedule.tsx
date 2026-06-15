@@ -322,13 +322,10 @@ export default function SubwaySchedule() {
               <div className="text-4xl font-extrabold text-white tracking-widest tabular-nums drop-shadow-md">
                 {formatTime(currentTime)}
               </div>
-              <div className="mt-3 flex items-center justify-center gap-2 text-[11px] font-semibold text-slate-300">
+              <div className="mt-3 flex items-center justify-center text-[11px] font-semibold text-slate-300">
                 <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/10 px-2.5 py-1">
                   <CalendarDays className="h-3 w-3" />
                   {dayType}
-                </span>
-                <span className="rounded-full border border-white/10 bg-white/10 px-2.5 py-1">
-                  {isAutoDirection ? '自动' : '手动'} · {directionOptions[direction].label}
                 </span>
               </div>
             </div>
@@ -339,7 +336,7 @@ export default function SubwaySchedule() {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`flex h-11 items-center justify-center gap-2 rounded-2xl text-sm font-semibold transition ${activeTab === tab ? 'bg-white text-slate-950 shadow-lg' : 'text-slate-300 hover:bg-white/10'}`}
+                className={`flex h-11 items-center justify-center gap-2 rounded-2xl border text-sm font-semibold transition ${activeTab === tab ? 'border-cyan-300/30 bg-cyan-400/15 text-cyan-100 shadow-[0_0_18px_rgba(34,211,238,0.12)]' : 'border-transparent text-slate-300 hover:bg-white/10'}`}
               >
                 {tab === 'subway' ? <Train className="h-4 w-4" /> : <Bus className="h-4 w-4" />}
                 {tab === 'subway' ? '地铁' : '班车'}
