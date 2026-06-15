@@ -384,12 +384,12 @@ export default function SubwaySchedule() {
                       <div className="text-xl font-bold text-white">{directionOptions[direction].label}</div>
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-2 gap-2 overflow-hidden rounded-2xl">
                     {(['morning', 'evening'] as DirectionKey[]).map(key => (
                       <button
                         key={key}
                         onClick={() => handleDirectionChange(key)}
-                        className={`flex min-h-12 items-center justify-center gap-2 rounded-2xl border px-2 text-sm font-semibold transition ${direction === key ? 'border-cyan-300/40 bg-cyan-400/20 text-cyan-100' : 'border-white/10 bg-black/20 text-slate-300 hover:bg-white/10'}`}
+                        className={`flex min-h-12 items-center justify-center gap-2 overflow-hidden rounded-2xl border px-2 text-sm font-semibold transition-colors duration-150 ${direction === key ? 'border-cyan-300/40 bg-cyan-400/20 text-cyan-100' : 'border-white/10 bg-slate-950/35 text-slate-300 hover:border-cyan-300/20 hover:bg-cyan-400/10 hover:text-cyan-100'}`}
                       >
                         <ArrowLeftRight className="h-4 w-4 shrink-0" />
                         <span>{key === 'morning' ? '上班' : '下班'}</span>
