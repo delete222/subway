@@ -52,6 +52,7 @@ interface BusRoute {
 
 const TRAVEL_TIME_MIN = 8;
 const TRAVEL_TIME_MAX = 10;
+const EVENING_PAST_BUFFER_MIN = 2;
 const changpingStations = [
   '昌平西山口',
   '十三陵景区',
@@ -249,7 +250,7 @@ function buildTrains(dataset: SubwayDataset | undefined, now: Date, direction: D
       const trainTime = new Date(now);
       trainTime.setHours(hour, entry.minute, 0, 0);
       const minutesLeft = Math.floor((trainTime.getTime() - now.getTime()) / 1000 / 60);
-      if (minutesLeft < -10) return;
+      if (direction === 'evening' ? minutesLeft < -EVENING_PAST_BUFFER_MIN : minutesLeft < -10) return;
 
       const isDongguanDepartureTrain = direction === 'morning' && isDongguanDeparture(entry);
       const isFilteredShortTurn = direction === 'morning' ? skipsNanShao(entry) || !canReachOffice(entry.terminus) : !canReachHome(entry.terminus);
