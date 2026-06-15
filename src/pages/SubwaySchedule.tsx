@@ -24,7 +24,6 @@ interface SubwayDataset {
 interface SubwayTrain {
   station: string;
   directionLabel: string;
-  focusLabel: string;
   destination: string;
   time: string;
   hour: number;
@@ -78,18 +77,16 @@ const changpingStations = [
 const homeStationIndex = changpingStations.indexOf('南邵');
 const officeStationIndex = changpingStations.indexOf('西二旗');
 
-const directionOptions: Record<DirectionKey, { label: string; station: string; targetText: string; focusLabel: string }> = {
+const directionOptions: Record<DirectionKey, { label: string; station: string; targetText: string }> = {
   morning: {
     label: '上班去公司',
     station: '南邵站',
     targetText: '开往蓟门桥站方向',
-    focusLabel: '昌平东关发车，南邵上车',
   },
   evening: {
     label: '下班回家',
     station: '西二旗站',
     targetText: '开往昌平西山口站方向',
-    focusLabel: '西二旗出发回南邵',
   },
 };
 
@@ -225,7 +222,7 @@ function skipsNanShao(entry: SubwayEntry) {
 
 function getTrainDetail(train: SubwayTrain, direction: DirectionKey) {
   if (direction === 'morning') {
-    return train.isDongguanDeparture ? '昌平东关发车，南邵上车' : `开往 ${train.destination.replace('站', '')}`;
+    return train.isDongguanDeparture ? '东关发车 · 南邵上车' : `南邵上车 · 开往 ${train.destination.replace('站', '')}`;
   }
   return `开往 ${train.destination.replace('站', '')}`;
 }
@@ -256,7 +253,6 @@ function buildTrains(dataset: SubwayDataset | undefined, now: Date, direction: D
       trains.push({
         station: dataset.station,
         directionLabel: directionOptions[direction].label,
-        focusLabel: directionOptions[direction].focusLabel,
         destination: entry.terminus,
         time: `${hourText.padStart(2, '0')}:${entry.minute.toString().padStart(2, '0')}`,
         hour,
@@ -409,7 +405,6 @@ export default function SubwaySchedule() {
                       </div>
                       <div className="flex items-end justify-between mb-6">
                         <div>
-                          <p className="text-slate-400 text-sm mb-1">{nextTrain.focusLabel}</p>
                           <div className="text-2xl font-bold text-white">{nextTrain.station.replace('站', '')}</div>
                           <p className="mt-1 text-sm text-slate-400">{getTrainDetail(nextTrain, direction)}</p>
                         </div>
