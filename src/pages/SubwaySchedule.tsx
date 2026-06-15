@@ -164,6 +164,11 @@ function getDayType(date: Date): DayType {
   return day === 0 || day === 6 ? '双休日' : '工作日';
 }
 
+function getDefaultTab(date: Date): TabKey {
+  const minutes = date.getHours() * 60 + date.getMinutes();
+  return minutes >= 9 * 60 + 35 && minutes <= 17 * 60 + 50 ? 'bus' : 'subway';
+}
+
 function getTrainStatus(minutesLeft: number, direction: DirectionKey, isPreferred: boolean): string {
   if (direction === 'evening') {
     return isPreferred ? '可到南邵' : '短线车';
@@ -271,10 +276,11 @@ function buildTrains(dataset: SubwayDataset | undefined, now: Date, direction: D
 
 export default function SubwaySchedule() {
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [activeTab, setActiveTab] = useState<TabKey>('subway');
+  const [activeTab, setActiveTab] = useState<TabKey>(() => getDefaultTab(new Date()));
   const [direction, setDirection] = useState<DirectionKey>(() => getDefaultDirection(new Date()));
   const [dayType, setDayType] = useState<DayType>(() => getDayType(new Date()));
   const [isAutoDirection, setIsAutoDirection] = useState(true);
+  const [isAutoTab, setIsAutoTab] = useState(true);
   const [selectedTrain, setSelectedTrain] = useState<SubwayTrain | null>(null);
   const [isManualMode, setIsManualMode] = useState(false);
   const [selectedBusRoute, setSelectedBusRoute] = useState<BusRoute | null>(null);
@@ -289,7 +295,8 @@ export default function SubwaySchedule() {
   useEffect(() => {
     setDayType(getDayType(currentTime));
     if (isAutoDirection) setDirection(getDefaultDirection(currentTime));
-  }, [currentTime, isAutoDirection]);
+    if (isAutoTab) setActiveTab(getDefaultTab(currentTime));
+  }, [currentTime, isAutoDirection, isAutoTab]);
 
   const dataset = useMemo(() => findDataset(dayType, direction), [dayType, direction]);
   const availableTrains = useMemo(() => buildTrains(dataset, currentTime, direction), [dataset, currentTime, direction]);
@@ -355,7 +362,10 @@ export default function SubwaySchedule() {
             {(['subway', 'bus'] as TabKey[]).map(tab => (
               <button
                 key={tab}
-                onClick={() => setActiveTab(tab)}
+                onClick={() => {
+                  setActiveTab(tab);
+                  setIsAutoTab(false);
+                }}
                 className={`flex h-11 items-center justify-center gap-2 rounded-2xl border text-sm font-semibold transition ${activeTab === tab ? 'border-cyan-300/30 bg-cyan-400/15 text-cyan-100 shadow-[0_0_18px_rgba(34,211,238,0.12)]' : 'border-transparent text-slate-300 hover:bg-white/10'}`}
               >
                 {tab === 'subway' ? <Train className="h-4 w-4" /> : <Bus className="h-4 w-4" />}
