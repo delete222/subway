@@ -97,8 +97,8 @@ const busRoutes: BusRoute[] = [
     name: '方舟→百度大厦',
     from: '方舟大厦',
     to: '百度大厦',
-    gradientFrom: 'from-emerald-500',
-    gradientTo: 'to-cyan-500',
+    gradientFrom: 'from-cyan-500',
+    gradientTo: 'to-blue-500',
     schedules: [
       { hour: 10, minute: 25, time: '10:25' },
       { hour: 11, minute: 0, time: '11:00' },
@@ -335,7 +335,7 @@ export default function SubwaySchedule() {
   return (
     <div className="flex h-[100dvh] flex-col overflow-hidden bg-slate-950 relative font-sans">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-[#0f172a] to-slate-950" />
-      <div className="absolute top-0 inset-x-0 h-64 bg-gradient-to-b from-blue-900/20 to-transparent" />
+      <div className="absolute top-0 inset-x-0 h-64 bg-gradient-to-b from-cyan-900/20 to-transparent" />
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDE2YzAtMi4yMSAxLjc5LTQgNC00czQgMS43OSA0IDQtMS43OSA0LTQgNC00LTEuNzktNC00em0wIDI0YzAtMi4yMSAxLjc5LTQgNC00czQgMS43OSA0IDQtMS43OSA0LTQgNC00LTEuNzktNC00ek0xMiAxNmMwLTIuMjEgMS43OS00IDQtNHM0IDEuNzkgNCA0LTEuNzkgNC00IDQtNC0xLjc5LTQtNHptMCAyNGMwLTIuMjEgMS43OS00IDQtNHM0IDEuNzkgNCA0LTEuNzkgNC00IDQtNC0xLjc5LTQtNHoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-20 mix-blend-overlay" />
 
       <div className="flex-1 overflow-y-auto overflow-x-hidden pb-24 relative z-10 scrollbar-hide">
@@ -400,10 +400,10 @@ export default function SubwaySchedule() {
 
                 {nextTrain ? (
                   <div className="relative rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700/50">
-                    <div className="absolute top-0 right-0 p-32 bg-blue-500/10 rounded-full blur-3xl" />
+                    <div className="absolute top-0 right-0 p-32 bg-cyan-500/10 rounded-full blur-3xl" />
                     <div className="p-5 relative z-10">
                       <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2 text-blue-200 text-xs font-medium bg-blue-500/10 px-3 py-1.5 rounded-full border border-blue-500/20">
+                        <div className="flex items-center gap-2 text-cyan-200 text-xs font-medium bg-cyan-500/10 px-3 py-1.5 rounded-full border border-cyan-500/20">
                           <Timer className="w-3.5 h-3.5" />
                           {isManualMode ? '已选班次' : '系统推荐下一班'}
                         </div>
@@ -420,18 +420,18 @@ export default function SubwaySchedule() {
                         </div>
                         <div className="text-right">
                           <p className="text-slate-400 text-sm mb-1">发车时间</p>
-                          <div className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300 tabular-nums">
+                          <div className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-indigo-300 tabular-nums">
                             {nextTrain.time}
                           </div>
                         </div>
                       </div>
                       <div className="rounded-2xl bg-black/40 border border-white/5 p-6 flex flex-col items-center justify-center relative overflow-hidden group">
-                        <div className="absolute inset-0 bg-blue-500/5 mix-blend-screen opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <div className="absolute inset-0 bg-cyan-500/5 mix-blend-screen opacity-0 group-hover:opacity-100 transition-opacity" />
                         <span className="text-sm text-slate-400 mb-2 font-medium tracking-widest">距离发车还有</span>
                         <div className="text-6xl sm:text-7xl font-black text-white tabular-nums tracking-tighter drop-shadow-[0_0_15px_rgba(59,130,246,0.5)]">
                           {formatCountdown(countdown)}
                         </div>
-                        <div className={`mt-3 rounded-full px-3 py-1 text-xs font-semibold ${nextTrain.isPreferred ? 'bg-emerald-400/15 text-emerald-200 border border-emerald-400/20' : 'bg-white/10 text-slate-300 border border-white/10'}`}>
+                        <div className={`mt-3 rounded-full px-3 py-1 text-xs font-semibold ${nextTrain.isPreferred ? 'bg-cyan-400/15 text-cyan-100 border border-cyan-300/20' : 'bg-white/10 text-slate-300 border border-white/10'}`}>
                           {nextTrain.status || '普通班次'}
                         </div>
                       </div>
@@ -459,7 +459,7 @@ export default function SubwaySchedule() {
                     {availableTrains.map(train => {
                       const isSelected = isManualMode && selectedTrain?.time === train.time && selectedTrain?.destination === train.destination;
                       const tone = train.isPreferred
-                        ? 'border-emerald-400/25 bg-gradient-to-br from-emerald-400/15 to-cyan-400/5 text-white shadow-[0_0_18px_rgba(16,185,129,0.08)]'
+                        ? 'border-cyan-300/25 bg-gradient-to-br from-cyan-400/16 to-indigo-400/8 text-white shadow-[0_0_18px_rgba(34,211,238,0.08)]'
                         : train.isFilteredShortTurn
                           ? 'border-white/5 bg-black/20 text-slate-500 opacity-45'
                           : 'border-white/5 bg-black/20 text-slate-300 opacity-75';
@@ -468,21 +468,21 @@ export default function SubwaySchedule() {
                           whileTap={{ scale: 0.96 }}
                           key={`${train.time}-${train.destination}`}
                           onClick={() => { setSelectedTrain(train); setIsManualMode(true); }}
-                          className={`relative min-h-[92px] overflow-hidden rounded-2xl border p-3 text-left transition-all hover:opacity-100 ${isSelected ? 'border-blue-400/60 bg-blue-500/20 text-blue-100 shadow-[0_0_22px_rgba(59,130,246,0.15)]' : tone}`}
+                          className={`relative min-h-[92px] overflow-hidden rounded-2xl border p-3 text-left transition-all hover:opacity-100 ${isSelected ? 'border-cyan-300/60 bg-cyan-500/18 text-cyan-50 shadow-[0_0_22px_rgba(34,211,238,0.15)]' : tone}`}
                         >
-                          <div className={`absolute -right-6 -top-8 h-20 w-20 rounded-full blur-2xl ${train.isPreferred ? 'bg-emerald-400/20' : 'bg-white/5'}`} />
+                          <div className={`absolute -right-6 -top-8 h-20 w-20 rounded-full blur-2xl ${train.isPreferred ? 'bg-cyan-400/20' : 'bg-white/5'}`} />
                           <div className="relative z-10 flex items-start justify-between gap-2">
                             <div className="text-2xl font-black leading-none tabular-nums tracking-normal">{train.time}</div>
-                            <span className={`shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold ${train.isPreferred ? 'border-emerald-300/25 bg-emerald-300/15 text-emerald-200' : 'border-white/10 bg-white/5 text-slate-400'}`}>
+                            <span className={`shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold ${train.isPreferred ? 'border-cyan-300/25 bg-cyan-300/15 text-cyan-100' : 'border-white/10 bg-white/5 text-slate-400'}`}>
                               {train.isPreferred ? (direction === 'morning' ? '东关发车' : '到家') : train.isFilteredShortTurn ? (direction === 'morning' ? '不可乘' : '不到家') : '普通'}
                             </span>
                           </div>
                           <div className="relative z-10 mt-3 flex items-end justify-between gap-2">
                             <div className="min-w-0">
-                              <div className={`truncate text-sm font-semibold ${train.isPreferred ? 'text-emerald-100' : 'text-slate-400'}`}>
+                              <div className={`truncate text-sm font-semibold ${train.isPreferred ? 'text-cyan-50' : 'text-slate-400'}`}>
                                 {direction === 'morning' && train.isDongguanDeparture ? '南邵上车' : train.destination.replace('站', '')}
                               </div>
-                              <div className={`mt-0.5 truncate text-[10px] ${train.isPreferred ? 'text-emerald-200/70' : 'text-slate-600'}`}>
+                              <div className={`mt-0.5 truncate text-[10px] ${train.isPreferred ? 'text-cyan-100/70' : 'text-slate-600'}`}>
                                 {train.status || '普通班次'}
                               </div>
                             </div>
@@ -527,21 +527,21 @@ export default function SubwaySchedule() {
                     </div>
                     {nextBus ? (
                       <div className="relative rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700/50">
-                        <div className="absolute top-0 right-0 p-32 bg-green-500/10 rounded-full blur-3xl" />
+                        <div className="absolute top-0 right-0 p-32 bg-cyan-500/10 rounded-full blur-3xl" />
                         <div className="p-5 relative z-10">
                           <div className="flex items-center justify-between mb-6">
-                            <div className="flex items-center gap-2 text-green-200 text-xs font-medium bg-green-500/10 px-3 py-1.5 rounded-full border border-green-500/20">
+                            <div className="flex items-center gap-2 text-cyan-200 text-xs font-medium bg-cyan-500/10 px-3 py-1.5 rounded-full border border-cyan-500/20">
                               <Timer className="w-3.5 h-3.5" />
                               {isBusManualMode ? '已选班次' : '下一趟发车'}
                             </div>
                             {isBusManualMode && <button onClick={() => { setIsBusManualMode(false); setSelectedBus(null); }} className="text-xs px-3 py-1.5 bg-white/10 text-white rounded-full hover:bg-white/20 transition-all font-medium backdrop-blur-md">恢复推荐</button>}
                           </div>
                           <div className="text-center mb-6">
-                            <div className="text-5xl sm:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-emerald-300 to-green-500 tabular-nums drop-shadow-sm">{nextBus.time}</div>
+                            <div className="text-5xl sm:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-cyan-300 to-blue-500 tabular-nums drop-shadow-sm">{nextBus.time}</div>
                           </div>
                           <div className="rounded-2xl bg-black/40 border border-white/5 p-5 flex flex-col items-center justify-center relative">
                             <span className="text-[10px] text-slate-400 uppercase tracking-[0.2em] mb-1">Countdown</span>
-                            <div className="text-5xl font-bold text-white tabular-nums tracking-tighter drop-shadow-[0_0_12px_rgba(16,185,129,0.4)]">{formatCountdown(busCountdown)}</div>
+                            <div className="text-5xl font-bold text-white tabular-nums tracking-tighter drop-shadow-[0_0_12px_rgba(34,211,238,0.4)]">{formatCountdown(busCountdown)}</div>
                           </div>
                         </div>
                       </div>
