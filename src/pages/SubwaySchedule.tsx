@@ -440,23 +440,42 @@ export default function SubwaySchedule() {
                     <span className="text-xs text-slate-400">重点 {preferredCount} 班{direction === 'evening' ? ` · 淡化 ${filteredCount} 班不到家` : ''}</span>
                   </div>
                   {availableTrains.length > 0 ? (
-                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-                    {availableTrains.map((train, index) => {
+                    <div className="grid grid-cols-2 gap-3">
+                    {availableTrains.map(train => {
                       const isSelected = isManualMode && selectedTrain?.time === train.time && selectedTrain?.destination === train.destination;
+                      const tone = train.isPreferred
+                        ? 'border-emerald-400/25 bg-gradient-to-br from-emerald-400/15 to-cyan-400/5 text-white shadow-[0_0_18px_rgba(16,185,129,0.08)]'
+                        : train.isFilteredShortTurn
+                          ? 'border-white/5 bg-black/20 text-slate-500 opacity-45'
+                          : 'border-white/5 bg-black/20 text-slate-300 opacity-75';
                       return (
-                        <motion.div
+                        <motion.button
                           whileTap={{ scale: 0.96 }}
                           key={`${train.time}-${train.destination}`}
                           onClick={() => { setSelectedTrain(train); setIsManualMode(true); }}
-                          className={`relative flex min-h-24 cursor-pointer flex-col items-center justify-center rounded-2xl border p-3 transition-all ${isSelected ? 'border-blue-500/50 bg-blue-500/20 text-blue-300' : train.isPreferred ? 'border-emerald-400/20 bg-emerald-400/10 text-slate-100 hover:bg-emerald-400/15' : 'border-white/5 bg-black/20 text-slate-400 opacity-60 hover:bg-black/40 hover:opacity-90'}`}
+                          className={`relative min-h-[92px] overflow-hidden rounded-2xl border p-3 text-left transition-all hover:opacity-100 ${isSelected ? 'border-blue-400/60 bg-blue-500/20 text-blue-100 shadow-[0_0_22px_rgba(59,130,246,0.15)]' : tone}`}
                         >
-                          <div className={`absolute top-2 left-2 h-1.5 w-1.5 rounded-full ${train.isPreferred ? 'bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]' : 'bg-slate-500'}`} />
-                          <div className="font-bold text-lg tabular-nums">{train.time}</div>
-                          <div className={`mt-0.5 max-w-full truncate text-[10px] font-medium ${train.isPreferred ? 'text-emerald-300/90' : 'text-slate-500'}`}>
-                            {train.destination.replace('站', '')}
+                          <div className={`absolute -right-6 -top-8 h-20 w-20 rounded-full blur-2xl ${train.isPreferred ? 'bg-emerald-400/20' : 'bg-white/5'}`} />
+                          <div className="relative z-10 flex items-start justify-between gap-2">
+                            <div className="text-2xl font-black leading-none tabular-nums tracking-normal">{train.time}</div>
+                            <span className={`shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold ${train.isPreferred ? 'border-emerald-300/25 bg-emerald-300/15 text-emerald-200' : 'border-white/10 bg-white/5 text-slate-400'}`}>
+                              {train.isPreferred ? (direction === 'morning' ? '重点' : '到家') : train.isFilteredShortTurn ? '不到家' : '普通'}
+                            </span>
                           </div>
-                          <div className={`mt-1 text-[10px] ${train.isPreferred ? 'text-emerald-200/80' : 'text-slate-600'}`}>{formatMinutesLeft(train.minutesLeft)}</div>
-                        </motion.div>
+                          <div className="relative z-10 mt-3 flex items-end justify-between gap-2">
+                            <div className="min-w-0">
+                              <div className={`truncate text-sm font-semibold ${train.isPreferred ? 'text-emerald-100' : 'text-slate-400'}`}>
+                                {train.destination.replace('站', '')}
+                              </div>
+                              <div className={`mt-0.5 truncate text-[10px] ${train.isPreferred ? 'text-emerald-200/70' : 'text-slate-600'}`}>
+                                {train.status || '普通班次'}
+                              </div>
+                            </div>
+                            <div className={`shrink-0 text-right text-[11px] font-semibold ${train.isPreferred ? 'text-cyan-100' : 'text-slate-500'}`}>
+                              {formatMinutesLeft(train.minutesLeft)}
+                            </div>
+                          </div>
+                        </motion.button>
                       );
                     })}
                     </div>
