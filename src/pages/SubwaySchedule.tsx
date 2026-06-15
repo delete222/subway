@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeftRight, Bus, CalendarDays, Clock, MapPin, Timer, Train } from 'lucide-react';
+import { ArrowLeftRight, Bus, CalendarDays, Clock, Timer, Train } from 'lucide-react';
 import { changpingLineSchedules } from '@/data/changpingLine';
 
 type DayType = '工作日' | '双休日';
@@ -306,25 +306,40 @@ export default function SubwaySchedule() {
   const filteredCount = availableTrains.filter(train => train.isFilteredShortTurn).length;
 
   return (
-    <div className="flex h-[100dvh] flex-col overflow-hidden bg-[#101820] font-sans text-white">
-      <div className="flex-1 overflow-y-auto overflow-x-hidden pb-24">
-        <div className="mx-auto max-w-2xl space-y-4 p-4">
-          <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} className="pt-8">
-            <div className="rounded-lg border border-white/10 bg-white/[0.06] p-4 shadow-xl">
-              <div className="mb-2 flex items-center justify-between gap-3 text-xs font-semibold text-cyan-100">
-                <span className="inline-flex items-center gap-2"><Clock className="h-4 w-4" />北京时间</span>
-                <span className="inline-flex items-center gap-2"><CalendarDays className="h-4 w-4" />{dayType}</span>
+    <div className="flex h-[100dvh] flex-col overflow-hidden bg-slate-950 relative font-sans">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-[#0f172a] to-slate-950" />
+      <div className="absolute top-0 inset-x-0 h-64 bg-gradient-to-b from-blue-900/20 to-transparent" />
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDE2YzAtMi4yMSAxLjc5LTQgNC00czQgMS43OSA0IDQtMS43OSA0LTQgNC00LTEuNzktNC00em0wIDI0YzAtMi4yMSAxLjc5LTQgNC00czQgMS43OSA0IDQtMS43OSA0LTQgNC00LTEuNzktNC00ek0xMiAxNmMwLTIuMjEgMS43OS00IDQtNHM0IDEuNzkgNCA0LTEuNzkgNC00IDQtNC0xLjc5LTQtNHptMCAyNGMwLTIuMjEgMS43OS00IDQtNHM0IDEuNzkgNCA0LTEuNzkgNC00IDQtNC0xLjc5LTQtNHoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-20 mix-blend-overlay" />
+
+      <div className="flex-1 overflow-y-auto overflow-x-hidden pb-24 relative z-10 scrollbar-hide">
+        <div className="max-w-2xl mx-auto p-4 space-y-5">
+          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-center pt-12 pb-2">
+            <div className="mx-auto w-4/5 p-4 rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl">
+              <div className="flex items-center justify-center gap-2 text-indigo-200 text-xs font-semibold uppercase tracking-wider mb-1">
+                <Clock className="w-3.5 h-3.5" />
+                <span>北京时间</span>
               </div>
-              <div className="text-4xl font-black tabular-nums tracking-normal">{formatTime(currentTime)}</div>
+              <div className="text-4xl font-extrabold text-white tracking-widest tabular-nums drop-shadow-md">
+                {formatTime(currentTime)}
+              </div>
+              <div className="mt-3 flex items-center justify-center gap-2 text-[11px] font-semibold text-slate-300">
+                <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/10 px-2.5 py-1">
+                  <CalendarDays className="h-3 w-3" />
+                  {dayType}
+                </span>
+                <span className="rounded-full border border-white/10 bg-white/10 px-2.5 py-1">
+                  {isAutoDirection ? '自动' : '手动'} · {directionOptions[direction].label}
+                </span>
+              </div>
             </div>
           </motion.div>
 
-          <div className="grid grid-cols-2 gap-2 rounded-lg border border-white/10 bg-black/20 p-1">
+          <div className="grid grid-cols-2 gap-2 rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 p-1.5 shadow-xl">
             {(['subway', 'bus'] as TabKey[]).map(tab => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`flex h-11 items-center justify-center gap-2 rounded-md text-sm font-semibold transition ${activeTab === tab ? 'bg-cyan-400 text-slate-950' : 'text-slate-300 hover:bg-white/10'}`}
+                className={`flex h-11 items-center justify-center gap-2 rounded-2xl text-sm font-semibold transition ${activeTab === tab ? 'bg-white text-slate-950 shadow-lg' : 'text-slate-300 hover:bg-white/10'}`}
               >
                 {tab === 'subway' ? <Train className="h-4 w-4" /> : <Bus className="h-4 w-4" />}
                 {tab === 'subway' ? '地铁' : '班车'}
@@ -334,12 +349,12 @@ export default function SubwaySchedule() {
 
           <AnimatePresence mode="wait">
             {activeTab === 'subway' ? (
-              <motion.div key="subway" initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 16 }} className="space-y-4">
-                <div className="rounded-lg border border-white/10 bg-white/[0.06] p-4">
+              <motion.div key="subway" initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 30 }} transition={{ duration: 0.3, ease: 'easeOut' }} className="space-y-4">
+                <div className="rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 p-4 shadow-2xl">
                   <div className="mb-3 flex items-center justify-between gap-3">
                     <div>
-                      <div className="text-sm text-slate-400">当前方向</div>
-                      <div className="text-lg font-bold">{directionOptions[direction].label}</div>
+                      <div className="text-sm text-slate-400">当前通勤</div>
+                      <div className="text-xl font-bold text-white">{directionOptions[direction].label}</div>
                     </div>
                     <button
                       onClick={() => {
@@ -348,7 +363,7 @@ export default function SubwaySchedule() {
                         setIsManualMode(false);
                         setSelectedTrain(null);
                       }}
-                      className={`h-9 rounded-md px-3 text-xs font-semibold transition ${isAutoDirection ? 'bg-cyan-400 text-slate-950' : 'bg-white/10 text-slate-200 hover:bg-white/15'}`}
+                      className={`h-9 rounded-full px-4 text-xs font-semibold transition ${isAutoDirection ? 'bg-cyan-400 text-slate-950' : 'bg-white/10 text-white hover:bg-white/20'}`}
                     >
                       自动
                     </button>
@@ -358,7 +373,7 @@ export default function SubwaySchedule() {
                       <button
                         key={key}
                         onClick={() => handleDirectionChange(key)}
-                        className={`flex min-h-12 items-center justify-center gap-2 rounded-md border px-2 text-sm font-semibold transition ${direction === key ? 'border-cyan-300 bg-cyan-400/20 text-cyan-100' : 'border-white/10 bg-black/20 text-slate-300 hover:bg-white/10'}`}
+                        className={`flex min-h-12 items-center justify-center gap-2 rounded-2xl border px-2 text-sm font-semibold transition ${direction === key ? 'border-cyan-300/40 bg-cyan-400/20 text-cyan-100' : 'border-white/10 bg-black/20 text-slate-300 hover:bg-white/10'}`}
                       >
                         <ArrowLeftRight className="h-4 w-4 shrink-0" />
                         <span>{key === 'morning' ? '上班' : '下班'}</span>
@@ -368,91 +383,140 @@ export default function SubwaySchedule() {
                 </div>
 
                 {nextTrain ? (
-                  <div className="rounded-lg border border-cyan-300/30 bg-gradient-to-br from-[#13252d] to-[#101820] p-5 shadow-2xl">
-                    <div className="mb-4 flex items-center justify-between gap-3">
-                      <div className="inline-flex items-center gap-2 rounded-md bg-cyan-400/10 px-3 py-2 text-xs font-semibold text-cyan-100">
-                        <Timer className="h-4 w-4" />
-                        {isManualMode ? '已选班次' : '推荐下一班'}
+                  <div className="relative rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700/50">
+                    <div className="absolute top-0 right-0 p-32 bg-blue-500/10 rounded-full blur-3xl" />
+                    <div className="p-5 relative z-10">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2 text-blue-200 text-xs font-medium bg-blue-500/10 px-3 py-1.5 rounded-full border border-blue-500/20">
+                          <Timer className="w-3.5 h-3.5" />
+                          {isManualMode ? '已选班次' : '系统推荐下一班'}
+                        </div>
+                        {isManualMode && (
+                          <button onClick={() => { setIsManualMode(false); setSelectedTrain(null); }} className="text-xs px-3 py-1.5 bg-white/10 text-white rounded-full hover:bg-white/20 transition-all font-medium backdrop-blur-md">
+                            恢复默认
+                          </button>
+                        )}
                       </div>
-                      {isManualMode && <button onClick={() => { setIsManualMode(false); setSelectedTrain(null); }} className="h-9 rounded-md bg-white/10 px-3 text-xs font-semibold text-white">恢复推荐</button>}
-                    </div>
-                    <div className="mb-5 grid grid-cols-[1fr_auto] items-end gap-3">
-                      <div>
-                        <p className="text-sm text-slate-400">{nextTrain.focusLabel}</p>
-                        <h1 className="text-2xl font-black">{nextTrain.station.replace('站', '')}</h1>
-                        <p className="mt-1 flex items-center gap-1 text-sm text-slate-300"><MapPin className="h-4 w-4" />终点 {nextTrain.destination}</p>
+                      <div className="flex items-end justify-between mb-6">
+                        <div>
+                          <p className="text-slate-400 text-sm mb-1">{nextTrain.focusLabel}</p>
+                          <div className="text-2xl font-bold text-white">{nextTrain.station.replace('站', '')}</div>
+                          <p className="mt-1 text-sm text-slate-400">终点 {nextTrain.destination}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-slate-400 text-sm mb-1">发车时间</p>
+                          <div className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300 tabular-nums">
+                            {nextTrain.time}
+                          </div>
+                        </div>
                       </div>
-                      <div className="text-right">
-                        <p className="text-sm text-slate-400">发车</p>
-                        <div className="text-4xl font-black tabular-nums text-cyan-200">{nextTrain.time}</div>
+                      <div className="rounded-2xl bg-black/40 border border-white/5 p-6 flex flex-col items-center justify-center relative overflow-hidden group">
+                        <div className="absolute inset-0 bg-blue-500/5 mix-blend-screen opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <span className="text-sm text-slate-400 mb-2 font-medium tracking-widest">距离发车还有</span>
+                        <div className="text-6xl sm:text-7xl font-black text-white tabular-nums tracking-tighter drop-shadow-[0_0_15px_rgba(59,130,246,0.5)]">
+                          {formatCountdown(countdown)}
+                        </div>
+                        <div className={`mt-3 rounded-full px-3 py-1 text-xs font-semibold ${nextTrain.isPreferred ? 'bg-emerald-400/15 text-emerald-200 border border-emerald-400/20' : 'bg-white/10 text-slate-300 border border-white/10'}`}>
+                          {nextTrain.status || '普通班次'}
+                        </div>
                       </div>
-                    </div>
-                    <div className="rounded-lg border border-white/10 bg-black/30 p-5 text-center">
-                      <div className="mb-2 text-xs font-semibold uppercase tracking-normal text-slate-400">距离发车</div>
-                      <div className="text-6xl font-black tabular-nums tracking-normal">{formatCountdown(countdown)}</div>
-                      <div className="mt-3 text-sm font-semibold text-amber-200">{nextTrain.status}</div>
                     </div>
                   </div>
                 ) : (
-                  <div className="rounded-lg border border-white/10 bg-white/[0.06] p-8 text-center text-slate-300">今日地铁已停运或暂无排班</div>
+                  <div className="rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 p-8 text-center shadow-2xl">
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-slate-800 rounded-full mb-4 shadow-inner">
+                      <Clock className="w-8 h-8 text-slate-400" />
+                    </div>
+                    <p className="text-lg font-medium text-slate-300">今日地铁已停运或暂无排班</p>
+                  </div>
                 )}
 
-                <div className="rounded-lg border border-white/10 bg-white/[0.06] p-4">
-                  <div className="mb-3 flex items-center justify-between gap-3">
-                    <h3 className="flex items-center gap-2 text-lg font-bold"><Train className="h-5 w-5 text-cyan-300" />当日剩余时刻</h3>
-                    <span className="text-xs text-slate-400">重点 {preferredCount} 班{direction === 'evening' ? ` · 已淡化 ${filteredCount} 班不到家` : ''}</span>
+                <div className="rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 p-5 shadow-2xl">
+                  <div className="flex items-center justify-between gap-3 mb-4 text-white">
+                    <div className="flex items-center gap-2">
+                      <Train className="w-5 h-5 text-indigo-400" />
+                      <h3 className="font-semibold text-lg tracking-wide">当日剩余时刻</h3>
+                    </div>
+                    <span className="text-xs text-slate-400">重点 {preferredCount} 班{direction === 'evening' ? ` · 淡化 ${filteredCount} 班不到家` : ''}</span>
                   </div>
-                  <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-                    {availableTrains.map(train => {
+                  {availableTrains.length > 0 ? (
+                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                    {availableTrains.map((train, index) => {
                       const isSelected = isManualMode && selectedTrain?.time === train.time && selectedTrain?.destination === train.destination;
                       return (
-                        <motion.button
+                        <motion.div
                           whileTap={{ scale: 0.96 }}
                           key={`${train.time}-${train.destination}`}
                           onClick={() => { setSelectedTrain(train); setIsManualMode(true); }}
-                          className={`min-h-20 rounded-md border p-2 text-left transition ${isSelected ? 'border-cyan-300 bg-cyan-400/20' : train.isPreferred ? 'border-emerald-300/30 bg-emerald-400/10 hover:bg-emerald-400/15' : 'border-white/10 bg-black/20 opacity-55 hover:opacity-80'}`}
+                          className={`relative flex min-h-24 cursor-pointer flex-col items-center justify-center rounded-2xl border p-3 transition-all ${isSelected ? 'border-blue-500/50 bg-blue-500/20 text-blue-300' : train.isPreferred ? 'border-emerald-400/20 bg-emerald-400/10 text-slate-100 hover:bg-emerald-400/15' : 'border-white/5 bg-black/20 text-slate-400 opacity-60 hover:bg-black/40 hover:opacity-90'}`}
                         >
-                          <div className="text-lg font-black tabular-nums">{train.time}</div>
-                          <div className="mt-1 truncate text-xs text-slate-300">{train.destination.replace('站', '')}</div>
-                          <div className={`mt-1 text-xs ${train.isPreferred ? 'text-emerald-200' : 'text-slate-500'}`}>{formatMinutesLeft(train.minutesLeft)}</div>
-                        </motion.button>
+                          <div className={`absolute top-2 left-2 h-1.5 w-1.5 rounded-full ${train.isPreferred ? 'bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]' : 'bg-slate-500'}`} />
+                          <div className="font-bold text-lg tabular-nums">{train.time}</div>
+                          <div className={`mt-0.5 max-w-full truncate text-[10px] font-medium ${train.isPreferred ? 'text-emerald-300/90' : 'text-slate-500'}`}>
+                            {train.destination.replace('站', '')}
+                          </div>
+                          <div className={`mt-1 text-[10px] ${train.isPreferred ? 'text-emerald-200/80' : 'text-slate-600'}`}>{formatMinutesLeft(train.minutesLeft)}</div>
+                        </motion.div>
                       );
                     })}
-                  </div>
+                    </div>
+                  ) : (
+                    <p className="text-center text-slate-500 py-4 text-sm">暂无可用班次</p>
+                  )}
                 </div>
               </motion.div>
             ) : (
               <motion.div key="bus" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} className="space-y-4">
                 {!selectedBusRoute ? (
-                  <div className="grid gap-3">
+                  <div className="space-y-4">
+                    <h2 className="text-white font-semibold text-lg px-2">请选择班车方向</h2>
+                    <div className="grid grid-cols-1 gap-4">
                     {busRoutes.map(route => (
-                      <button key={route.name} onClick={() => { setSelectedBusRoute(route); setIsBusManualMode(false); setSelectedBus(null); }} className="rounded-lg border border-white/10 bg-white/[0.06] p-5 text-left shadow-xl transition hover:bg-white/10">
-                        <div className="flex items-center gap-4">
-                          <div className={`flex h-12 w-12 items-center justify-center rounded-md bg-gradient-to-br ${route.gradientFrom} ${route.gradientTo}`}><Bus className="h-6 w-6" /></div>
-                          <div><div className="text-xl font-bold">{route.name}</div><div className="mt-1 text-sm text-slate-400">{route.from} → {route.to}</div></div>
+                      <motion.div whileTap={{ scale: 0.98 }} key={route.name} onClick={() => { setSelectedBusRoute(route); setIsBusManualMode(false); setSelectedBus(null); }} className="relative overflow-hidden p-6 rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 shadow-xl cursor-pointer hover:bg-white/10 transition-all">
+                        <div className={`absolute -right-6 -top-6 w-24 h-24 rounded-full bg-gradient-to-br ${route.gradientFrom} ${route.gradientTo} opacity-20 blur-2xl`} />
+                        <div className="flex items-center gap-4 relative z-10">
+                          <div className={`flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br ${route.gradientFrom} ${route.gradientTo} text-white shadow-lg`}><Bus className="h-6 w-6" /></div>
+                          <div><div className="text-xl font-bold text-white tracking-wide">{route.name}</div><div className="mt-1 flex items-center gap-2 text-sm text-slate-400"><span>{route.from}</span><span className="opacity-50">→</span><span>{route.to}</span></div></div>
                         </div>
-                      </button>
+                      </motion.div>
                     ))}
+                    </div>
                   </div>
                 ) : (
                   <>
-                    <div className="flex items-center justify-between rounded-lg border border-white/10 bg-white/[0.06] p-4">
-                      <div className="font-bold">{selectedBusRoute.name}</div>
-                      <button onClick={() => setSelectedBusRoute(null)} className="h-9 rounded-md bg-white/10 px-3 text-xs font-semibold">换向</button>
+                    <div className="flex items-center justify-between p-4 rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 shadow-lg mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className={`flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br ${selectedBusRoute.gradientFrom} ${selectedBusRoute.gradientTo} text-white shadow-inner`}><Bus className="w-5 h-5" /></div>
+                        <div className="font-bold text-white leading-tight">{selectedBusRoute.name}</div>
+                      </div>
+                      <button onClick={() => setSelectedBusRoute(null)} className="text-xs px-4 py-2 bg-white/10 text-white rounded-full hover:bg-white/20 transition-colors backdrop-blur-md">换向</button>
                     </div>
                     {nextBus ? (
-                      <div className="rounded-lg border border-emerald-300/30 bg-[#13251f] p-5 text-center shadow-2xl">
-                        <div className="mb-2 text-xs font-semibold text-emerald-100">{isBusManualMode ? '已选班次' : '下一趟发车'}</div>
-                        <div className="text-6xl font-black tabular-nums text-emerald-200">{nextBus.time}</div>
-                        <div className="mt-4 rounded-lg border border-white/10 bg-black/30 p-4 text-5xl font-black tabular-nums">{formatCountdown(busCountdown)}</div>
-                        {isBusManualMode && <button onClick={() => { setIsBusManualMode(false); setSelectedBus(null); }} className="mt-4 h-9 rounded-md bg-white/10 px-3 text-xs font-semibold">恢复推荐</button>}
+                      <div className="relative rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700/50">
+                        <div className="absolute top-0 right-0 p-32 bg-green-500/10 rounded-full blur-3xl" />
+                        <div className="p-5 relative z-10">
+                          <div className="flex items-center justify-between mb-6">
+                            <div className="flex items-center gap-2 text-green-200 text-xs font-medium bg-green-500/10 px-3 py-1.5 rounded-full border border-green-500/20">
+                              <Timer className="w-3.5 h-3.5" />
+                              {isBusManualMode ? '已选班次' : '下一趟发车'}
+                            </div>
+                            {isBusManualMode && <button onClick={() => { setIsBusManualMode(false); setSelectedBus(null); }} className="text-xs px-3 py-1.5 bg-white/10 text-white rounded-full hover:bg-white/20 transition-all font-medium backdrop-blur-md">恢复推荐</button>}
+                          </div>
+                          <div className="text-center mb-6">
+                            <div className="text-5xl sm:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-emerald-300 to-green-500 tabular-nums drop-shadow-sm">{nextBus.time}</div>
+                          </div>
+                          <div className="rounded-2xl bg-black/40 border border-white/5 p-5 flex flex-col items-center justify-center relative">
+                            <span className="text-[10px] text-slate-400 uppercase tracking-[0.2em] mb-1">Countdown</span>
+                            <div className="text-5xl font-bold text-white tabular-nums tracking-tighter drop-shadow-[0_0_12px_rgba(16,185,129,0.4)]">{formatCountdown(busCountdown)}</div>
+                          </div>
+                        </div>
                       </div>
-                    ) : <div className="rounded-lg border border-white/10 bg-white/[0.06] p-8 text-center text-slate-300">今日班车已结束</div>}
-                    <div className="rounded-lg border border-white/10 bg-white/[0.06] p-4">
-                      <h3 className="mb-3 font-bold">当日剩余时刻</h3>
-                      <div className="grid grid-cols-2 gap-2">
+                    ) : <div className="rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 p-8 text-center shadow-2xl text-slate-300">今日班车已结束</div>}
+                    <div className="rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 p-5 shadow-2xl mt-4">
+                      <h3 className="font-semibold text-slate-200 tracking-wide mb-4">当日剩余时刻</h3>
+                      <div className="grid grid-cols-2 gap-3">
                         {availableBuses.map(bus => (
-                          <button key={bus.time} onClick={() => { setSelectedBus(bus); setIsBusManualMode(true); }} className="rounded-md border border-white/10 bg-black/20 p-3 text-lg font-bold tabular-nums hover:bg-white/10">{bus.time}</button>
+                          <motion.button whileTap={{ scale: 0.95 }} key={bus.time} onClick={() => { setSelectedBus(bus); setIsBusManualMode(true); }} className="relative p-4 rounded-2xl border border-white/5 bg-black/20 text-slate-300 hover:bg-black/40 transition-all text-lg font-bold tabular-nums">{bus.time}</motion.button>
                         ))}
                       </div>
                     </div>
