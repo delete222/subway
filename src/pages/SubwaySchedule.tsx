@@ -351,22 +351,11 @@ export default function SubwaySchedule() {
             {activeTab === 'subway' ? (
               <motion.div key="subway" initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 30 }} transition={{ duration: 0.3, ease: 'easeOut' }} className="space-y-4">
                 <div className="rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 p-4 shadow-2xl">
-                  <div className="mb-3 flex items-center justify-between gap-3">
+                  <div className="mb-3">
                     <div>
                       <div className="text-sm text-slate-400">当前通勤</div>
                       <div className="text-xl font-bold text-white">{directionOptions[direction].label}</div>
                     </div>
-                    <button
-                      onClick={() => {
-                        setIsAutoDirection(true);
-                        setDirection(getDefaultDirection(currentTime));
-                        setIsManualMode(false);
-                        setSelectedTrain(null);
-                      }}
-                      className={`h-9 rounded-full px-4 text-xs font-semibold transition ${isAutoDirection ? 'bg-cyan-400 text-slate-950' : 'bg-white/10 text-white hover:bg-white/20'}`}
-                    >
-                      自动
-                    </button>
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     {(['morning', 'evening'] as DirectionKey[]).map(key => (
