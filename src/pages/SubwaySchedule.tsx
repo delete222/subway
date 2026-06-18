@@ -31,6 +31,7 @@ interface SubwayTrain {
   minutesLeft: number;
   isPreferred: boolean;
   isDongguanDeparture: boolean;
+  skipsNanShao: boolean;
   isFilteredShortTurn: boolean;
   status: string;
 }
@@ -170,7 +171,8 @@ function getDefaultTab(date: Date): TabKey {
   return minutes >= 9 * 60 + 35 && minutes <= 17 * 60 + 50 ? 'bus' : 'subway';
 }
 
-function getTrainStatus(minutesLeft: number, direction: DirectionKey, isPreferred: boolean): string {
+function getTrainStatus(minutesLeft: number, direction: DirectionKey, isPreferred: boolean, skipsNanShaoStation: boolean): string {
+  if (skipsNanShaoStation) return '本站不停';
   if (direction === 'evening') {
     return isPreferred ? '可到南邵' : '短线车';
   }
@@ -252,8 +254,9 @@ function buildTrains(dataset: SubwayDataset | undefined, now: Date, direction: D
       const minutesLeft = Math.floor((trainTime.getTime() - now.getTime()) / 1000 / 60);
       if (direction === 'evening' ? minutesLeft < -EVENING_PAST_BUFFER_MIN : minutesLeft < -10) return;
 
+      const skipsNanShaoStation = skipsNanShao(entry);
       const isDongguanDepartureTrain = direction === 'morning' && isDongguanDeparture(entry);
-      const isFilteredShortTurn = direction === 'morning' ? skipsNanShao(entry) || !canReachOffice(entry.terminus) : !canReachHome(entry.terminus);
+      const isFilteredShortTurn = direction === 'morning' ? skipsNanShaoStation || !canReachOffice(entry.terminus) : !canReachHome(entry.terminus);
       const isPreferred = direction === 'morning' ? isDongguanDepartureTrain : !isFilteredShortTurn;
 
       trains.push({
@@ -266,8 +269,9 @@ function buildTrains(dataset: SubwayDataset | undefined, now: Date, direction: D
         minutesLeft,
         isPreferred,
         isDongguanDeparture: isDongguanDepartureTrain,
+        skipsNanShao: skipsNanShaoStation,
         isFilteredShortTurn,
-        status: getTrainStatus(minutesLeft, direction, isPreferred),
+        status: getTrainStatus(minutesLeft, direction, isPreferred, skipsNanShaoStation),
       });
     });
   });
